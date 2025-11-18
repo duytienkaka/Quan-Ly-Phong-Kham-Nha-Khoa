@@ -132,7 +132,6 @@
     </div>
 
     <div class="form-actions">
-        <button type="submit" class="btn-primary">Lưu cập nhật</button>
         <a href="index.php?controller=receptionist&action=invoices" class="btn-secondary">
             ← Quay lại danh sách
         </a>

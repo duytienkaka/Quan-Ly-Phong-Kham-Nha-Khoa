@@ -1,10 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../models/User.php';
-// nếu có các model khác, bạn có thể require thêm:
-// require_once __DIR__ . '/../models/Patient.php';
-// require_once __DIR__ . '/../models/Doctor.php';
-// require_once __DIR__ . '/../models/Appointment.php';
 
 class ReceptionistController
 {
@@ -89,13 +85,27 @@ class ReceptionistController
                     break;
             }
         }
+        $sqlFreeDoc = "
+            SELECT d.doctor_id, u.full_name
+            FROM doctors d
+            JOIN users u ON d.user_id = u.user_id
+            LEFT JOIN appointments a2
+                ON a2.doctor_id = d.doctor_id
+                AND a2.status = 'IN_PROGRESS'
+            WHERE a2.appointment_id IS NULL
+            ORDER BY u.full_name ASC
+        ";
+        $freeDoctors = $pdo->query($sqlFreeDoc)->fetchAll();
+        $freeDoctorsCount = count($freeDoctors);
 
-        // Danh sách lịch hẹn hôm nay (tối đa 20)
+        // Danh sách lịch hẹn hôm nay (tối đa 20) – CÓ queue_number
         $sqlList = "
             SELECT
                 a.appointment_id,
                 a.appointment_date,
+                a.queue_number,
                 a.status,
+                a.time_block,
                 a.note,
                 p.full_name AS patient_name,
                 p.phone     AS patient_phone,
@@ -105,7 +115,7 @@ class ReceptionistController
             LEFT JOIN doctors d  ON a.doctor_id = d.doctor_id
             LEFT JOIN users   udoc ON d.user_id = udoc.user_id
             WHERE DATE(a.appointment_date) = CURDATE()
-            ORDER BY a.appointment_date ASC, a.appointment_id ASC
+            ORDER BY a.queue_number ASC, a.appointment_date ASC, a.appointment_id ASC
             LIMIT 20
         ";
         $appointmentsToday = $pdo->query($sqlList)->fetchAll();
@@ -147,15 +157,16 @@ class ReceptionistController
             FROM appointments a
             JOIN patients p ON a.patient_id = p.patient_id
             WHERE DATE(a.appointment_date) = CURDATE() AND a.status = 'WAITING'
-            ORDER BY a.appointment_date ASC
+            ORDER BY a.queue_number ASC, a.appointment_date ASC, a.appointment_id ASC
             LIMIT 6
         ";
         $pendingApprovals = $pdo->query($sqlPending)->fetchAll();
+        $freeDoctors      = $freeDoctors ?? [];
+        $freeDoctorsCount = $freeDoctorsCount ?? 0;
 
         $pageTitle = 'Dashboard lễ tân';
         $view      = __DIR__ . '/../views/receptionist/dashboard.php';
 
-        // pass new data to view
         $upcomingAppointments = $upcomingAppointments ?? [];
         $recentPatients      = $recentPatients      ?? [];
         $pendingApprovals    = $pendingApprovals    ?? [];
@@ -174,8 +185,8 @@ class ReceptionistController
         $user   = User::findById($userId);
 
         // Bộ lọc
-        $date   = $_GET['date']   ?? date('Y-m-d');
-        $status = $_GET['status'] ?? '';
+        $date    = $_GET['date']   ?? date('Y-m-d');
+        $status  = $_GET['status'] ?? '';
         $keyword = trim($_GET['q'] ?? '');
 
         // phân trang
@@ -211,11 +222,13 @@ class ReceptionistController
         if ($page > $totalPages) $page = $totalPages;
         $offset = ($page - 1) * $pageSize;
 
-        // Lấy danh sách
+        // Lấy danh sách (CÓ queue_number)
         $sql = "
             SELECT
                 a.appointment_id,
                 a.appointment_date,
+                a.queue_number,
+                a.time_block,
                 a.status,
                 a.note,
                 p.full_name AS patient_name,
@@ -226,7 +239,7 @@ class ReceptionistController
             LEFT JOIN doctors d  ON a.doctor_id = d.doctor_id
             LEFT JOIN users   udoc ON d.user_id = udoc.user_id
             WHERE $where
-            ORDER BY a.appointment_date ASC, a.appointment_id ASC
+            ORDER BY a.queue_number ASC, a.appointment_date ASC, a.appointment_id ASC
             LIMIT :limit OFFSET :offset
         ";
         $stmt = $pdo->prepare($sql);
@@ -275,7 +288,7 @@ class ReceptionistController
         $patients = $stmt->fetchAll();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $mode = $_POST['patient_mode'] ?? 'existing';
+            $mode       = $_POST['patient_mode'] ?? 'existing';
             $patient_id = 0;
 
             // bệnh nhân có sẵn
@@ -327,21 +340,32 @@ class ReceptionistController
                 } else {
                     $appointmentDateTime = $date . ' ' . $time . ':00';
 
+                    // Tính queue_number tiếp theo cho ngày đó
+                    $stmtQ = $pdo->prepare("
+                        SELECT MAX(queue_number)
+                        FROM appointments
+                        WHERE DATE(appointment_date) = :d
+                    ");
+                    $stmtQ->execute(['d' => $date]);
+                    $maxQueue  = (int)$stmtQ->fetchColumn();
+                    $nextQueue = $maxQueue + 1;
+
                     $stmtIns = $pdo->prepare("
                         INSERT INTO appointments
-                            (patient_id, doctor_id, appointment_date, status, note, created_at)
+                            (patient_id, doctor_id, appointment_date, queue_number, status, note, created_at)
                         VALUES
-                            (:pid, NULL, :dt, :st, :note, NOW())
+                            (:pid, NULL, :dt, :qnum, :st, :note, NOW())
                     ");
                     $stmtIns->execute([
                         'pid'  => $patient_id,
                         'dt'   => $appointmentDateTime,
+                        'qnum' => $nextQueue,
                         'st'   => $status,
                         'note' => $note ?: null,
                     ]);
 
-                    $success = 'Đã tạo lịch hẹn mới.';
-                    $_POST = []; // reset form
+                    $success = 'Đã tạo lịch hẹn mới. Số thứ tự: #' . $nextQueue;
+                    $_POST   = []; // reset form
                 }
             }
         }
@@ -378,38 +402,33 @@ class ReceptionistController
             $actionType = $_POST['action_type'] ?? '';
 
             try {
-                if ($actionType === 'assign_doctor') {
+                if ($actionType === 'update_main') {
+
                     $doctor_id = (int)($_POST['doctor_id'] ?? 0);
+                    $status    = trim($_POST['status'] ?? '');
 
-                    $stmtUp = $pdo->prepare("
-                        UPDATE appointments
-                        SET doctor_id = :did
-                        WHERE appointment_id = :id
-                    ");
-                    $stmtUp->execute([
-                        'did' => ($doctor_id > 0 ? $doctor_id : null),
-                        'id'  => $id,
-                    ]);
-                    $success = 'Đã cập nhật bác sĩ cho lịch hẹn.';
-                } elseif ($actionType === 'update_status') {
-                    $newStatus = trim($_POST['status'] ?? '');
-                    $allowed = ['WAITING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW'];
+                    $allowedStatus = ['WAITING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW'];
 
-                    if (!in_array($newStatus, $allowed, true)) {
+                    if (!in_array($status, $allowedStatus, true)) {
                         $error = 'Trạng thái không hợp lệ.';
                     } else {
-                        $stmtUp = $pdo->prepare("
+                        $stmt = $pdo->prepare("
                             UPDATE appointments
-                            SET status = :st
+                            SET doctor_id = :did,
+                                status    = :st
                             WHERE appointment_id = :id
                         ");
-                        $stmtUp->execute([
-                            'st' => $newStatus,
-                            'id' => $id,
+                        $stmt->execute([
+                            'did' => ($doctor_id > 0 ? $doctor_id : null),
+                            'st'  => $status,
+                            'id'  => $id,
                         ]);
-                        $success = 'Đã cập nhật trạng thái lịch hẹn.';
+
+                        header('Location: index.php?controller=receptionist&action=appointments');
+                        exit;
                     }
                 } elseif ($actionType === 'cancel') {
+
                     $reason = trim($_POST['cancel_reason'] ?? '');
                     if ($reason === '') {
                         $error = 'Vui lòng nhập lý do hủy lịch.';
@@ -417,14 +436,14 @@ class ReceptionistController
                         $stmtUp = $pdo->prepare("
                             UPDATE appointments
                             SET status = 'CANCELLED',
-                                note   = :note
+                                note   = :reason
                             WHERE appointment_id = :id
                         ");
                         $stmtUp->execute([
-                            'note' => '[Hủy]: ' . $reason,
-                            'id'   => $id,
+                            'reason' => '[Hủy]: ' . $reason,
+                            'id'     => $id,
                         ]);
-                        $success = 'Đã hủy lịch hẹn.';
+
                         header('Location: index.php?controller=receptionist&action=appointments');
                         exit;
                     }
@@ -434,11 +453,11 @@ class ReceptionistController
             }
         }
 
-        // lấy lại thông tin lịch hẹn
         $sql = "
             SELECT
                 a.appointment_id,
                 a.appointment_date,
+                a.queue_number,
                 a.status,
                 a.note,
                 p.patient_id,
@@ -466,7 +485,6 @@ class ReceptionistController
 
         $currentDoctorId = $appointment['doctor_id'] ?? null;
 
-        // danh sách bác sĩ đang RẢNH (không có IN_PROGRESS) + bác sĩ hiện tại
         $sqlDoc = "
             SELECT d.doctor_id, u.full_name
             FROM doctors d
@@ -476,11 +494,15 @@ class ReceptionistController
                 AND a2.status = 'IN_PROGRESS'
             WHERE a2.appointment_id IS NULL
         ";
+
         if ($currentDoctorId) {
             $sqlDoc .= " OR d.doctor_id = :curDoc ";
         }
-        $sqlDoc .= " GROUP BY d.doctor_id, u.full_name
-                     ORDER BY u.full_name ASC";
+
+        $sqlDoc .= "
+            GROUP BY d.doctor_id, u.full_name
+            ORDER BY u.full_name ASC
+        ";
 
         $stmtDoc = $pdo->prepare($sqlDoc);
         if ($currentDoctorId) {
@@ -489,12 +511,13 @@ class ReceptionistController
         $stmtDoc->execute();
         $doctors = $stmtDoc->fetchAll();
 
-        $pageTitle        = 'Chi tiết lịch hẹn #' . $id;
-        $view             = __DIR__ . '/../views/receptionist/appointment_detail.php';
-        $appointmentView  = $appointment;
-        $doctorsView      = $doctors;
-        $errorView        = $error;
-        $successView      = $success;
+        $pageTitle       = 'Chi tiết lịch hẹn #' . $id;
+        $view            = __DIR__ . '/../views/receptionist/appointment_detail.php';
+        $userView        = $user;
+        $appointmentView = $appointment;
+        $doctorsView     = $doctors;
+        $errorView       = $error;
+        $successView     = $success;
 
         include __DIR__ . '/../views/layouts/receptionist_layout.php';
     }
@@ -512,7 +535,6 @@ class ReceptionistController
         $error   = '';
         $success = '';
 
-        /* ===== XỬ LÝ CẬP NHẬT THANH TOÁN (POST) ===== */
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $invoiceId      = (int)($_POST['invoice_id'] ?? 0);
             $paymentStatus  = $_POST['payment_status'] ?? '';
@@ -546,8 +568,6 @@ class ReceptionistController
             }
         }
 
-        /* ===== LỌC VÀ DANH SÁCH HÓA ĐƠN (GET) ===== */
-
         $status  = $_GET['status'] ?? '';
         $keyword = trim($_GET['q'] ?? '');
         $date    = $_GET['date'] ?? '';
@@ -573,7 +593,6 @@ class ReceptionistController
             $params['id_kw'] = (int)$keyword ?: 0;
         }
 
-        // Đếm tổng
         $sqlCount = "
             SELECT COUNT(*)
             FROM invoices i
@@ -590,7 +609,6 @@ class ReceptionistController
         if ($page > $totalPages) $page = $totalPages;
         $offset = ($page - 1) * $pageSize;
 
-        // Lấy dữ liệu
         $sql = "
             SELECT
                 i.invoice_id,
@@ -637,7 +655,6 @@ class ReceptionistController
 
         include __DIR__ . '/../views/layouts/receptionist_layout.php';
     }
-    /* ================== CHI TIẾT HÓA ĐƠN (LỄ TÂN) ================== */
 
     public function invoiceDetail()
     {
@@ -667,11 +684,11 @@ class ReceptionistController
             } else {
                 try {
                     $stmtUp = $pdo->prepare("
-                        UPDATE invoices
-                        SET payment_status = :st,
-                            payment_method = :pm
-                        WHERE invoice_id = :id
-                    ");
+                    UPDATE invoices
+                    SET payment_status = :st,
+                        payment_method = :pm
+                    WHERE invoice_id = :id
+                ");
                     $stmtUp->execute([
                         'st' => $paymentStatus,
                         'pm' => $paymentMethod ?: null,
@@ -684,39 +701,39 @@ class ReceptionistController
             }
         }
 
-        // Lấy đầy đủ thông tin hóa đơn
+        // Lấy thông tin hóa đơn
         $sql = "
-            SELECT
-                i.invoice_id,
-                i.record_id,
-                i.patient_id,
-                i.created_at,
-                i.total_amount,
-                i.discount,
-                i.final_amount,
-                i.payment_status,
-                i.payment_method,
-                i.note,
+        SELECT
+            i.invoice_id,
+            i.record_id,
+            i.patient_id,
+            i.created_at,
+            i.total_amount,
+            i.discount,
+            i.final_amount,
+            i.payment_status,
+            i.payment_method,
+            i.note,
 
-                p.full_name  AS patient_name,
-                p.phone      AS patient_phone,
-                p.email      AS patient_email,
-                p.address    AS patient_address,
+            p.full_name  AS patient_name,
+            p.phone      AS patient_phone,
+            p.email      AS patient_email,
+            p.address    AS patient_address,
 
-                mr.visit_date,
-                mr.chief_complaint,
-                mr.diagnosis,
-                mr.treatment_plan,
+            mr.visit_date,
+            mr.chief_complaint,
+            mr.diagnosis,
+            mr.treatment_plan,
 
-                udoc.full_name AS doctor_name
-            FROM invoices i
-            JOIN patients p ON i.patient_id = p.patient_id
-            LEFT JOIN medical_records mr ON i.record_id = mr.record_id
-            LEFT JOIN doctors d         ON mr.doctor_id = d.doctor_id
-            LEFT JOIN users   udoc      ON d.user_id = udoc.user_id
-            WHERE i.invoice_id = :id
-            LIMIT 1
-        ";
+            udoc.full_name AS doctor_name
+        FROM invoices i
+        JOIN patients p ON i.patient_id = p.patient_id
+        LEFT JOIN medical_records mr ON i.record_id = mr.record_id
+        LEFT JOIN doctors d         ON mr.doctor_id = d.doctor_id
+        LEFT JOIN users   udoc      ON d.user_id = udoc.user_id
+        WHERE i.invoice_id = :id
+        LIMIT 1
+    ";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id' => $id]);
         $invoice = $stmt->fetch();
@@ -726,9 +743,27 @@ class ReceptionistController
             exit;
         }
 
+        // ✅ LẤY CHI TIẾT invoice_items
+        $sqlItems = "
+        SELECT
+            ii.quantity,
+            ii.unit_price,
+            ii.line_total,
+            s.service_name,
+            s.unit
+        FROM invoice_items ii
+        JOIN services s ON ii.service_id = s.service_id
+        WHERE ii.invoice_id = :iid
+        ORDER BY ii.item_id ASC
+    ";
+        $stmtItems = $pdo->prepare($sqlItems);
+        $stmtItems->execute(['iid' => $id]);
+        $items = $stmtItems->fetchAll();
+
         $pageTitle      = 'Chi tiết hóa đơn #' . $id;
         $view           = __DIR__ . '/../views/receptionist/invoice_detail.php';
         $invoiceView    = $invoice;
+        $invoiceItemsView = $items;
         $userView       = $user;
         $errorView      = $error;
         $successView    = $success;

@@ -1,148 +1,163 @@
-<section class="rc-dashboard">
-    <h1>Chi tiết lịch hẹn #<?= (int)$appointmentView['appointment_id'] ?></h1>
+<?php
 
-    <?php if (!empty($errorView)): ?>
-        <div class="form-error-box">
-            <?= htmlspecialchars($errorView) ?>
+/** @var array $appointmentView */
+/** @var array $doctorsView */
+$ap = $appointmentView;
+
+// format ngày giờ
+$ts  = strtotime($ap['appointment_date']);
+$day = date('d/m/Y', $ts);
+$time = date('H:i', $ts);
+
+// map status ra text + màu (class)
+$status = $ap['status'];
+function rc_status_label($st)
+{
+    switch ($st) {
+        case 'WAITING':
+            return 'Chờ khám';
+        case 'IN_PROGRESS':
+            return 'Đang khám';
+        case 'COMPLETED':
+            return 'Hoàn thành';
+        case 'CANCELLED':
+            return 'Đã hủy';
+        case 'NO_SHOW':
+            return 'Không đến';
+        default:
+            return $st;
+    }
+}
+function rc_status_class($st)
+{
+    switch ($st) {
+        case 'WAITING':
+            return 'tag tag-pending';
+        case 'IN_PROGRESS':
+            return 'tag tag-inprogress';
+        case 'COMPLETED':
+            return 'tag tag-done';
+        case 'CANCELLED':
+            return 'tag tag-canceled';
+        case 'NO_SHOW':
+            return 'tag tag-noshow';
+        default:
+            return 'tag';
+    }
+}
+?>
+
+<section class="rc-appointment-detail">
+
+    <!-- ====== PANEL TỔNG QUAN LỊCH HẸN + BỆNH NHÂN ====== -->
+    <div class="rc-panel rc-panel-summary">
+        <div class="rc-panel-header">
+            <h2>Chi tiết lịch hẹn #<?= (int)$ap['appointment_id'] ?></h2>
+            <?php if (!empty($ap['queue_number'])): ?>
+                <span class="rc-badge-queue">
+                    Số thứ tự: <strong>#<?= (int)$ap['queue_number'] ?></strong>
+                </span>
+            <?php endif; ?>
         </div>
-    <?php endif; ?>
 
-    <?php if (!empty($successView)): ?>
-        <div class="form-success-box">
-            <?= htmlspecialchars($successView) ?>
+        <p class="rc-appointment-desc">
+            Lịch hẹn của
+            <strong><?= htmlspecialchars($ap['patient_name']) ?></strong>
+            ngày <strong><?= $day ?></strong>.
+            Trạng thái hiện tại:
+            <span class="<?= rc_status_class($status) ?>"><?= rc_status_label($status) ?></span>.
+        </p>
+
+        <div class="rc-info-grid">
+            <!-- Cột: Thông tin lịch hẹn -->
+            <div class="rc-info-block">
+                <h3>Thông tin lịch hẹn</h3>
+                <div class="info-item">
+                    <label>Ngày khám:</label>
+                    <span><?= $day ?></span>
+                </div>
+                <div class="info-item">
+                    <label>Số thứ tự:</label>
+                    <span><?= !empty($ap['queue_number']) ? '#' . (int)$ap['queue_number'] : 'Chưa có' ?></span>
+                </div>
+                <div class="info-item">
+                    <label>Bác sĩ phụ trách:</label>
+                    <span><?= htmlspecialchars($ap['doctor_name'] ?? 'Chưa gán') ?></span>
+                </div>
+                <div class="info-item info-note">
+                    <label>Ghi chú từ bệnh nhân / lễ tân:</label>
+                    <span><?= nl2br(htmlspecialchars($ap['note'] ?? 'Không có')) ?></span>
+                </div>
+            </div>
+
+            <!-- Cột: Thông tin bệnh nhân -->
+            <div class="rc-info-block">
+                <h3>Thông tin bệnh nhân</h3>
+                <div class="info-item">
+                    <label>Họ tên:</label>
+                    <span><?= htmlspecialchars($ap['patient_name']) ?></span>
+                </div>
+                <div class="info-item">
+                    <label>Số điện thoại:</label>
+                    <span><?= htmlspecialchars($ap['patient_phone'] ?? 'Chưa cập nhật') ?></span>
+                </div>
+                <div class="info-item">
+                    <label>Email:</label>
+                    <span><?= htmlspecialchars($ap['patient_email'] ?? 'Chưa cập nhật') ?></span>
+                </div>
+                <div class="info-item">
+                    <label>Địa chỉ:</label>
+                    <span><?= htmlspecialchars($ap['patient_address'] ?? 'Chưa cập nhật') ?></span>
+                </div>
+            </div>
         </div>
-    <?php endif; ?>
+    </div>
 
+    <!-- ====== PANEL GÁN BÁC SĨ & CẬP NHẬT TRẠNG THÁI (GIỮ CODE CŨ) ====== -->
     <div class="rc-panel">
         <div class="rc-panel-header">
-            <h2>Thông tin bệnh nhân</h2>
-        </div>
-        <div class="info-grid">
-            <div class="info-item">
-                <label>Họ tên</label>
-                <span><?= htmlspecialchars($appointmentView['patient_name']) ?></span>
-            </div>
-            <div class="info-item">
-                <label>SĐT</label>
-                <span><?= htmlspecialchars($appointmentView['patient_phone'] ?? '—') ?></span>
-            </div>
-            <div class="info-item">
-                <label>Email</label>
-                <span><?= htmlspecialchars($appointmentView['patient_email'] ?? '—') ?></span>
-            </div>
-            <div class="info-item">
-                <label>Địa chỉ</label>
-                <span><?= htmlspecialchars($appointmentView['patient_address'] ?? '—') ?></span>
-            </div>
-        </div>
-    </div>
-
-    <div class="rc-panel" style="margin-top:12px;">
-        <div class="rc-panel-header">
-            <h2>Thông tin lịch hẹn</h2>
+            <h2>Gán bác sĩ & Cập nhật trạng thái</h2>
         </div>
 
-        <div class="info-grid">
-            <div class="info-item">
-                <label>Ngày / giờ</label>
-                <span>
-                    <?php
-                        $dt = strtotime($appointmentView['appointment_date']);
-                        echo date('H:i d/m/Y', $dt);
-                    ?>
-                </span>
-            </div>
-            <div class="info-item">
-                <label>Bác sĩ</label>
-                <span><?= htmlspecialchars($appointmentView['doctor_name'] ?? 'Chưa gán') ?></span>
-            </div>
-            <div class="info-item">
-                <label>Trạng thái hiện tại</label>
-                <span>
-                    <?php
-                        $st = $appointmentView['status'];
-                        if     ($st === 'WAITING')     echo '<span class="tag tag-pending">Chờ duyệt</span>';
-                        elseif ($st === 'IN_PROGRESS') echo '<span class="tag tag-inprogress">Đang khám</span>';
-                        elseif ($st === 'COMPLETED')   echo '<span class="tag tag-done">Hoàn thành</span>';
-                        elseif ($st === 'CANCELLED')   echo '<span class="tag tag-canceled">Đã hủy</span>';
-                        elseif ($st === 'NO_SHOW')     echo '<span class="tag tag-noshow">Không đến</span>';
-                        else                           echo '<span class="tag">Không xác định</span>';
-                    ?>
-                </span>
-            </div>
-        </div>
+        <form method="post"
+            action="index.php?controller=receptionist&action=appointmentDetail&id=<?= (int)$ap['appointment_id'] ?>"
+            class="form-card">
 
-        <div class="info-block">
-            <label>Ghi chú</label>
-            <p><?= nl2br(htmlspecialchars($appointmentView['note'] ?? '')) ?></p>
-        </div>
-    </div>
+            <input type="hidden" name="action_type" value="update_main">
 
-    <!-- Combined update panel: Gán bác sĩ + Cập nhật trạng thái -->
-    <div class="rc-panel" style="margin-top:12px;">
-        <div class="rc-panel-header">
-            <h2>Gán bác sĩ &amp; Cập nhật trạng thái</h2>
-        </div>
-
-        <form id="bulkUpdateForm" method="post" class="form-card">
-            <input type="hidden" name="appointment_id" value="<?= (int)$appointmentView['appointment_id'] ?>">
-
-            <div class="panel-row-2col">
-                <div>
-                    <div class="form-group">
-                        <label>Bác sĩ phụ trách</label>
-                        <select name="doctor_id" id="doctorSelect">
-                            <option value="">-- Chưa gán --</option>
-                            <?php foreach ($doctorsView as $d): ?>
-                                <option value="<?= (int)$d['doctor_id'] ?>"
-                                    <?= (isset($appointmentView['doctor_id']) && $appointmentView['doctor_id'] == $d['doctor_id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($d['full_name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+            <div class="form-row-2col">
+                <div class="form-group">
+                    <label>Bác sĩ phụ trách</label>
+                    <select name="doctor_id">
+                        <option value="0">-- Chưa gán bác sĩ --</option>
+                        <?php foreach ($doctorsView as $d): ?>
+                            <option value="<?= (int)$d['doctor_id'] ?>"
+                                <?= (!empty($ap['doctor_id']) && $ap['doctor_id'] == $d['doctor_id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($d['full_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
-                <div>
-                    <div class="form-group">
-                        <label>Trạng thái</label>
-                        <?php $stNow = $appointmentView['status']; ?>
-                        <select name="status" id="statusSelect">
-                            <option value="WAITING"     <?= $stNow === 'WAITING'     ? 'selected' : '' ?>>Chờ duyệt (WAITING)</option>
-                            <option value="IN_PROGRESS" <?= $stNow === 'IN_PROGRESS' ? 'selected' : '' ?>>Đang khám (IN_PROGRESS)</option>
-                            <option value="COMPLETED"   <?= $stNow === 'COMPLETED'   ? 'selected' : '' ?>>Hoàn thành (COMPLETED)</option>
-                            <option value="CANCELLED"   <?= $stNow === 'CANCELLED'   ? 'selected' : '' ?>>Đã hủy (CANCELLED)</option>
-                            <option value="NO_SHOW"     <?= $stNow === 'NO_SHOW'     ? 'selected' : '' ?>>Không đến (NO_SHOW)</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label>Trạng thái</label>
+                    <?php $st = $ap['status']; ?>
+                    <select name="status">
+                        <option value="WAITING" <?= $st === 'WAITING'    ? 'selected' : '' ?>>Chờ khám</option>
+                        <option value="IN_PROGRESS" <?= $st === 'IN_PROGRESS' ? 'selected' : '' ?>>Đang khám</option>
+                        <option value="COMPLETED" <?= $st === 'COMPLETED'  ? 'selected' : '' ?>>Hoàn thành</option>
+                        <option value="CANCELLED" <?= $st === 'CANCELLED'  ? 'selected' : '' ?>>Đã hủy</option>
+                        <option value="NO_SHOW" <?= $st === 'NO_SHOW'    ? 'selected' : '' ?>>Không đến</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="form-actions" style="margin-top:8px;">
-                <button id="bulkConfirmBtn" type="submit" class="btn-primary">Xác nhận cập nhật và quay lại</button>
-                <a href="index.php?controller=receptionist&action=appointments" class="btn-secondary">Hủy / Quay lại</a>
-            </div>
-        </form>
-    </div>
-
-    <!-- Hủy lịch -->
-    <div class="rc-panel" style="margin-top:12px;">
-        <div class="rc-panel-header">
-            <h2>Hủy lịch hẹn</h2>
-        </div>
-
-        <form method="post" class="form-card" onsubmit="return confirm('Bạn chắc chắn muốn hủy lịch hẹn này?');">
-            <input type="hidden" name="action_type" value="cancel">
-            <div class="form-group">
-                <label>Lý do hủy</label>
-                <textarea name="cancel_reason" rows="2"></textarea>
-            </div>
             <div class="form-actions">
-                <button type="submit" class="btn-secondary" style="border-color:#ef4444;color:#b91c1c;">
-                    Hủy lịch hẹn
+                <button type="submit" class="btn-primary">
+                    Xác nhận cập nhật và quay lại
                 </button>
                 <a href="index.php?controller=receptionist&action=appointments" class="btn-secondary">
-                    ← Quay lại danh sách
+                    Hủy / Quay lại
                 </a>
             </div>
         </form>

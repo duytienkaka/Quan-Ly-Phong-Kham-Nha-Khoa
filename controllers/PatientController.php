@@ -1,5 +1,4 @@
 <?php
-// controllers/PatientController.php
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Patient.php';
 require_once __DIR__ . '/../models/MedicalRecord.php';
@@ -36,17 +35,20 @@ class PatientController
         $isEditing = false; // đang xem bình thường
 
         // Thống kê nhanh (Quick stats)
-        $upcomingCount = 0;
-        $recordsCount = 0;
+        $upcomingCount      = 0;
+        $recordsCount       = 0;
         $unpaidInvoicesCount = 0;
 
         if ($patient) {
-            $pdo = getPDO();
+            $pdo       = getPDO();
             $patientId = $patient['patient_id'];
-            $today = date('Y-m-d');
+            $today     = date('Y-m-d');
 
-            // upcoming appointments (today or later, not canceled)
-            $sql = "SELECT COUNT(*) FROM appointments WHERE patient_id = :pid AND appointment_date >= :today";
+            // upcoming appointments (today or later)
+            $sql = "SELECT COUNT(*)
+                    FROM appointments
+                    WHERE patient_id = :pid
+                      AND appointment_date >= :today";
             $stmt = $pdo->prepare($sql);
             $stmt->bindValue(':pid', $patientId);
             $stmt->bindValue(':today', $today);
@@ -61,7 +63,10 @@ class PatientController
             $recordsCount = (int)$stmt->fetchColumn();
 
             // unpaid invoices (not PAID)
-            $sql = "SELECT COUNT(*) FROM invoices WHERE patient_id = :pid AND (payment_status IS NULL OR payment_status <> 'PAID')";
+            $sql = "SELECT COUNT(*)
+                    FROM invoices
+                    WHERE patient_id = :pid
+                      AND (payment_status IS NULL OR payment_status <> 'PAID')";
             $stmt = $pdo->prepare($sql);
             $stmt->bindValue(':pid', $patientId);
             $stmt->execute();
@@ -72,6 +77,7 @@ class PatientController
         $view      = __DIR__ . '/../views/patient/dashboard.php';
         include __DIR__ . '/../views/layouts/patient_layout.php';
     }
+
     public function edit()
     {
         $this->requirePatientLogin();
@@ -88,7 +94,6 @@ class PatientController
 
         include __DIR__ . '/../views/layouts/patient_layout.php';
     }
-
 
     // Lưu thông tin cá nhân
     public function saveProfile()
@@ -107,22 +112,21 @@ class PatientController
         $note          = trim($_POST['note'] ?? '');
 
         if ($full_name === '') {
-            // xử lý lỗi đơn giản, bạn có thể redirect lại và hiển thị message cho đẹp hơn
             die('Vui lòng nhập họ tên.');
         }
 
         try {
             $pdo->beginTransaction();
 
-            // 1) Update bảng users với thông tin chung
+            // 1) Update bảng users
             $stmt = $pdo->prepare("
-            UPDATE users
-            SET full_name = :full_name,
-                phone     = :phone,
-                email     = :email,
-                updated_at = NOW()
-            WHERE user_id = :uid
-        ");
+                UPDATE users
+                SET full_name = :full_name,
+                    phone     = :phone,
+                    email     = :email,
+                    updated_at = NOW()
+                WHERE user_id = :uid
+            ");
             $stmt->execute([
                 'full_name' => $full_name,
                 'phone'     => $phone,
@@ -136,19 +140,18 @@ class PatientController
             $patient = $stmt->fetch();
 
             if ($patient) {
-                // update
                 $stmt = $pdo->prepare("
-                UPDATE patients
-                SET full_name     = :full_name,
-                    gender        = :gender,
-                    date_of_birth = :dob,
-                    phone         = :phone,
-                    email         = :email,
-                    address       = :address,
-                    note          = :note,
-                    updated_at    = NOW()
-                WHERE user_id = :uid
-            ");
+                    UPDATE patients
+                    SET full_name     = :full_name,
+                        gender        = :gender,
+                        date_of_birth = :dob,
+                        phone         = :phone,
+                        email         = :email,
+                        address       = :address,
+                        note          = :note,
+                        updated_at    = NOW()
+                    WHERE user_id = :uid
+                ");
                 $stmt->execute([
                     'full_name' => $full_name,
                     'gender'    => $gender ?: null,
@@ -160,13 +163,12 @@ class PatientController
                     'uid'       => $userId,
                 ]);
             } else {
-                // insert mới
                 $stmt = $pdo->prepare("
-                INSERT INTO patients
-                    (user_id, full_name, gender, date_of_birth, phone, email, address, note, created_at)
-                VALUES
-                    (:uid, :full_name, :gender, :dob, :phone, :email, :address, :note, NOW())
-            ");
+                    INSERT INTO patients
+                        (user_id, full_name, gender, date_of_birth, phone, email, address, note, created_at)
+                    VALUES
+                        (:uid, :full_name, :gender, :dob, :phone, :email, :address, :note, NOW())
+                ");
                 $stmt->execute([
                     'uid'       => $userId,
                     'full_name' => $full_name,
@@ -181,7 +183,6 @@ class PatientController
 
             $pdo->commit();
 
-            // quay lại dashboard
             header('Location: index.php?controller=patient&action=dashboard');
             exit;
         } catch (Exception $e) {
@@ -210,6 +211,9 @@ class PatientController
         $toDate   = $_GET['to_date'] ?? '';
         $page     = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
         $pageSize = 10;
+
+        // thông báo số thứ tự vừa đặt thành công (nếu có)
+        $successQueue = isset($_GET['success_queue']) ? (int)$_GET['success_queue'] : 0;
 
         $pdo = getPDO();
 
@@ -240,10 +244,12 @@ class PatientController
 
         // Lấy dữ liệu trang hiện tại
         $sqlData = "SELECT *
-                FROM appointments
-                WHERE $where
-                ORDER BY appointment_date DESC, time_block DESC
-                LIMIT :limit OFFSET :offset";
+                    FROM appointments
+                    WHERE $where
+                    ORDER BY appointment_date DESC,
+                             time_block DESC,
+                             queue_number ASC";
+        $sqlData .= " LIMIT :limit OFFSET :offset";
 
         $stmt = $pdo->prepare($sqlData);
         foreach ($params as $k => $v) {
@@ -253,10 +259,11 @@ class PatientController
         $stmt->bindValue(':offset', $offset,   PDO::PARAM_INT);
         $stmt->execute();
         $appointments = $stmt->fetchAll();
+
         $pageTitle = 'Lịch hẹn của tôi';
         $view      = __DIR__ . '/../views/patient/appointments.php';
 
-        // Truyền thêm biến cho view (pagination meta)
+        // pagination meta
         $fromDateView = $fromDate;
         $toDateView   = $toDate;
         $currentPage  = $page;
@@ -264,6 +271,9 @@ class PatientController
         $perPage      = $pageSize;
         $startItem    = $totalRows > 0 ? ($offset + 1) : 0;
         $endItem      = $totalRows > 0 ? min($totalRows, $offset + $pageSize) : 0;
+
+        // truyền thêm successQueue cho view
+        $successQueueView = $successQueue;
 
         include __DIR__ . '/../views/layouts/patient_layout.php';
     }
@@ -282,7 +292,6 @@ class PatientController
             exit;
         }
 
-        // Có thể truyền thêm $error từ query string sau này, trước mắt để rỗng
         $error   = $_GET['error'] ?? '';
         $success = $_GET['success'] ?? '';
 
@@ -311,7 +320,7 @@ class PatientController
 
         $error = '';
 
-        // Validate đơn giản
+        // Validate
         if (empty($appointmentDate) || empty($timeBlock)) {
             $error = 'Vui lòng chọn ngày khám và buổi khám.';
         } else {
@@ -324,8 +333,7 @@ class PatientController
         if ($error !== '') {
             $pageTitle = 'Đặt lịch khám';
             $view      = __DIR__ . '/../views/patient/booking.php';
-            $appointments = []; // nếu view có dùng
-            // Biến cho view
+            $appointments = [];
             $appointmentDateOld = $appointmentDate;
             $timeBlockOld       = $timeBlock;
             $noteOld            = $note;
@@ -333,21 +341,44 @@ class PatientController
             return;
         }
 
-        // INSERT vào bảng appointments
+        // INSERT vào bảng appointments (kèm queue_number)
         $pdo = getPDO();
-        $sql = "INSERT INTO appointments (patient_id, doctor_id, appointment_date, time_block, status, booking_source, note, created_at)
-            VALUES (?, NULL, ?, ?, 'WAITING', 'PREBOOKED', ?, NOW())";
+
+        // Tính queue_number tiếp theo cho cùng ngày + buổi khám
+        $stmt = $pdo->prepare("
+            SELECT MAX(queue_number)
+            FROM appointments
+            WHERE appointment_date = :adate
+              AND time_block       = :block
+        ");
+        $stmt->execute([
+            'adate' => $appointmentDate,
+            'block' => $timeBlock,
+        ]);
+        $maxQueue  = (int)$stmt->fetchColumn();
+        $nextQueue = $maxQueue + 1;
+
+        $sql = "INSERT INTO appointments
+                    (patient_id, doctor_id, appointment_date, time_block, queue_number,
+                     status, booking_source, note, created_at)
+                VALUES
+                    (?, NULL, ?, ?, ?, 'WAITING', 'PREBOOKED', ?, NOW())";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             $patient['patient_id'],
             $appointmentDate,
             $timeBlock,
+            $nextQueue,
             $note
         ]);
 
-        header('Location: index.php?controller=patient&action=appointments');
+        $appointmentId = $pdo->lastInsertId();
+
+        // đưa queue number sang trang lịch hẹn để hiển thị cho bệnh nhân
+        header('Location: index.php?controller=patient&action=appointments&success_queue=' . (int)$nextQueue);
         exit;
     }
+
     public function history()
     {
         $this->requirePatientLogin();
@@ -394,10 +425,10 @@ class PatientController
         $offset = ($page - 1) * $pageSize;
 
         $sqlData = "SELECT *
-                FROM medical_records
-                WHERE $where
-                ORDER BY visit_date DESC, record_id DESC
-                LIMIT :limit OFFSET :offset";
+                    FROM medical_records
+                    WHERE $where
+                    ORDER BY visit_date DESC, record_id DESC
+                    LIMIT :limit OFFSET :offset";
 
         $stmt = $pdo->prepare($sqlData);
         foreach ($params as $k => $v) {
@@ -468,10 +499,10 @@ class PatientController
         $offset = ($page - 1) * $pageSize;
 
         $sqlData = "SELECT *
-                FROM invoices
-                WHERE $where
-                ORDER BY created_at DESC, invoice_id DESC
-                LIMIT :limit OFFSET :offset";
+                    FROM invoices
+                    WHERE $where
+                    ORDER BY created_at DESC, invoice_id DESC
+                    LIMIT :limit OFFSET :offset";
         $stmt = $pdo->prepare($sqlData);
         foreach ($params as $k => $v) {
             $stmt->bindValue(':' . $k, $v);
@@ -494,15 +525,15 @@ class PatientController
 
         include __DIR__ . '/../views/layouts/patient_layout.php';
     }
+
     public function invoiceDetail()
     {
-        // giống các hàm khác: bắt buộc patient đã login
         if (empty($_SESSION['user_id']) || $_SESSION['role'] !== 'patient') {
             header('Location: index.php?controller=auth&action=login');
             exit;
         }
 
-        $userId = (int)$_SESSION['user_id'];
+        $userId    = (int)$_SESSION['user_id'];
         $invoiceId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
         if ($invoiceId <= 0) {
@@ -512,7 +543,6 @@ class PatientController
 
         $pdo = getPDO();
 
-        // Lấy patient_id từ user_id (như các chỗ khác bạn đã dùng)
         $stmt = $pdo->prepare("
         SELECT patient_id
         FROM patients
@@ -528,7 +558,6 @@ class PatientController
 
         $patientId = (int)$patient['patient_id'];
 
-        // Lấy thông tin hóa đơn + lần khám + bác sĩ
         $sql = "
         SELECT
             i.invoice_id,
@@ -570,10 +599,27 @@ class PatientController
             echo "Không tìm thấy hóa đơn hoặc hóa đơn không thuộc về bạn.";
             exit;
         }
-        $user = User::findById($userId);
-        $pageTitle = 'Chi tiết hóa đơn';
-        $view      = __DIR__ . '/../views/patient/invoice_detail.php';
-        $invoiceView = $invoice;
+        $sqlItems = "
+        SELECT
+            ii.quantity,
+            ii.unit_price,
+            ii.line_total,
+            s.service_name,
+            s.unit
+        FROM invoice_items ii
+        JOIN services s ON ii.service_id = s.service_id
+        WHERE ii.invoice_id = :iid
+        ORDER BY ii.item_id ASC
+    ";
+        $stmtItems = $pdo->prepare($sqlItems);
+        $stmtItems->execute(['iid' => $invoiceId]);
+        $items = $stmtItems->fetchAll();
+
+        $user       = User::findById($userId);
+        $pageTitle  = 'Chi tiết hóa đơn';
+        $view       = __DIR__ . '/../views/patient/invoice_detail.php';
+        $invoiceView      = $invoice;
+        $invoiceItemsView = $items;
 
         include __DIR__ . '/../views/layouts/patient_layout.php';
     }

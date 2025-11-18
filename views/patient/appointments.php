@@ -1,6 +1,9 @@
-<?php
-// views/patient/appointments.php
-?>
+<?php if (!empty($successQueueView)): ?>
+    <div class="alert-success">
+        Bạn đã đặt lịch thành công. Số thứ tự của bạn là
+        <strong>#<?= (int)$successQueueView ?></strong>.
+    </div>
+<?php endif; ?>
 <section class="patient-appointments">
     <div class="section-header">
         <h2>Lịch hẹn của tôi</h2>

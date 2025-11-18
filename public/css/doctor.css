@@ -211,7 +211,6 @@ h3 {
     font-size: 13px;
     color: var(--dc-text-light);
 }
-
 /* ===== STATS GRID ===== */
 .dc-stats-grid {
     display: grid;
@@ -438,6 +437,13 @@ h3 {
 .form-group textarea {
     resize: vertical;
     line-height: 1.5;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--dc-text-muted);
 }
 
 .form-group small {
@@ -675,6 +681,291 @@ h3 {
     font-weight: 600;
 }
 
+/* Info block (used for appointment notes, etc) */
+.info-block {
+    padding: 12px 14px;
+    background: var(--dc-surface-2);
+    border-radius: var(--dc-radius);
+    border: 1px solid var(--dc-border-light);
+    margin-top: 12px;
+}
+
+.info-block label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dc-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 8px;
+}
+
+.info-block p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--dc-text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* ===== INFO BLOCK ===== */
+.info-block {
+    padding: 12px 14px;
+    background: var(--dc-surface-2);
+    border-radius: var(--dc-radius);
+    border: 1px solid var(--dc-border-light);
+    margin-top: 12px;
+}
+
+.info-block label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dc-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 8px;
+}
+
+.info-block p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--dc-text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* ===== INVOICE FORM - SERVICE PICKER ===== */
+.svc-picker {
+    display: grid;
+    grid-template-columns: 1fr 100px 140px;
+    gap: 12px;
+    padding: 14px;
+    background: var(--dc-surface-2);
+    border-radius: var(--dc-radius);
+    border: 1px solid var(--dc-border-light);
+    margin: 12px 0;
+    align-items: flex-end;
+}
+
+.svc-picker select {
+    padding: 12px 14px;
+    border: 1.5px solid var(--dc-border);
+    border-radius: var(--dc-radius);
+    font-size: 14px;
+    background: var(--dc-surface);
+    color: var(--dc-text);
+    font-family: inherit;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.svc-picker select:focus {
+    outline: none;
+    border-color: var(--dc-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.svc-picker select:hover {
+    border-color: var(--dc-primary);
+}
+
+/* Service quantity input in picker */
+#svc-qty {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--dc-border);
+    border-radius: var(--dc-radius);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    background: var(--dc-surface);
+    color: var(--dc-primary);
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+#svc-qty:focus {
+    outline: none;
+    border-color: var(--dc-primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+#svc-qty:hover {
+    border-color: var(--dc-primary);
+}
+
+/* ===== INVOICE FORM - SERVICE TABLE ===== */
+#selected-services-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: var(--dc-surface);
+    border-radius: var(--dc-radius);
+    overflow: hidden;
+}
+
+#selected-services-table thead {
+    background: var(--dc-surface-3);
+    border-bottom: 2px solid var(--dc-border);
+}
+
+#selected-services-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--dc-text-muted);
+}
+
+#selected-services-table tbody tr {
+    border-bottom: 1px solid var(--dc-border-light);
+    transition: all 0.2s ease;
+}
+
+#selected-services-table tbody tr:hover {
+    background: var(--dc-surface-2);
+}
+
+#selected-services-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--dc-text);
+    vertical-align: middle;
+}
+
+#selected-services-table tfoot {
+    background: linear-gradient(180deg, var(--dc-surface-2), var(--dc-surface-3));
+    border-top: 2px solid var(--dc-primary);
+}
+
+#selected-services-table tfoot tr {
+    font-weight: 700;
+}
+
+#selected-services-table tfoot td {
+    padding: 16px;
+    font-size: 15px;
+    color: var(--dc-primary);
+}
+
+/* Remove button styling */
+.btn-danger {
+    background: var(--dc-danger);
+    color: #fff;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+}
+
+/* Service quantity input in table */
+#selected-services-table .svc-qty-input {
+    width: 70px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--dc-border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    background: var(--dc-surface-2);
+    color: var(--dc-primary);
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+#selected-services-table .svc-qty-input:focus {
+    outline: none;
+    border-color: var(--dc-primary);
+    background: var(--dc-surface);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+#selected-services-table .svc-qty-input:hover {
+    border-color: var(--dc-primary);
+}
+
+/* Discount input */
+#discount-input {
+    padding: 12px 14px;
+    border: 1.5px solid var(--dc-border);
+    border-radius: var(--dc-radius);
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--dc-surface-2);
+    color: var(--dc-primary);
+    transition: all 0.2s ease;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#discount-input:focus {
+    outline: none;
+    border-color: var(--dc-primary);
+    background: var(--dc-surface);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+#discount-input:hover {
+    border-color: var(--dc-primary);
+}
+
+/* Total displays */
+#subtotal-display,
+#final-display {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dc-primary);
+    min-width: 120px;
+    text-align: right;
+}
+
+/* Invoice total display container */
+.form-group > div {
+    padding: 14px 16px;
+    background: var(--dc-surface-2);
+    border-radius: var(--dc-radius);
+    border: 1px solid var(--dc-border-light);
+    font-size: 15px;
+    color: var(--dc-text);
+    font-weight: 500;
+}
+
+/* ===== DASHBOARD SECTION ===== */
+.dc-dashboard {
+    width: 100%;
+}
+
+.dc-appointments {
+    width: 100%;
+}
+
+.dc-appointment-detail {
+    width: 100%;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .doctor-main {
@@ -724,6 +1015,7 @@ h3 {
     }
 
     .form-row-2col {
+        grid-template-columns: 1fr;
         gap: 12px;
     }
 
@@ -738,5 +1030,57 @@ h3 {
     .form-actions .btn-primary,
     .form-actions .btn-secondary {
         width: 100%;
+    }
+
+    /* ===== INVOICE FORM RESPONSIVE ===== */
+    .svc-picker {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .svc-picker select,
+    #svc-qty {
+        width: 100%;
+    }
+
+    .svc-picker button {
+        width: 100%;
+    }
+
+    /* Service table responsive */
+    #selected-services-table {
+        font-size: 13px;
+    }
+
+    #selected-services-table th,
+    #selected-services-table td {
+        padding: 10px 12px;
+    }
+
+    #selected-services-table .svc-qty-input {
+        width: 60px;
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+
+    .btn-danger {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    /* Totals responsive */
+    #subtotal-display,
+    #final-display {
+        font-size: 16px;
+        min-width: 100px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-item {
+        flex-direction: column;
     }
 }

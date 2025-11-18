@@ -26,13 +26,13 @@ $title = $isEdit ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới';
             <div class="form-group">
                 <label>Tên đăng nhập <span class="required">*</span></label>
                 <input type="text" name="username" required
-                       value="<?= htmlspecialchars($old['username'] ?? '') ?>">
+                    value="<?= htmlspecialchars($old['username'] ?? '') ?>">
             </div>
 
             <div class="form-group">
                 <label>Họ và tên <span class="required">*</span></label>
                 <input type="text" name="full_name" required
-                       value="<?= htmlspecialchars($old['full_name'] ?? '') ?>">
+                    value="<?= htmlspecialchars($old['full_name'] ?? '') ?>">
             </div>
         </div>
 
@@ -40,13 +40,13 @@ $title = $isEdit ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới';
             <div class="form-group">
                 <label>Email</label>
                 <input type="email" name="email"
-                       value="<?= htmlspecialchars($old['email'] ?? '') ?>">
+                    value="<?= htmlspecialchars($old['email'] ?? '') ?>">
             </div>
 
             <div class="form-group">
                 <label>Số điện thoại</label>
                 <input type="text" name="phone"
-                       value="<?= htmlspecialchars($old['phone'] ?? '') ?>">
+                    value="<?= htmlspecialchars($old['phone'] ?? '') ?>">
             </div>
         </div>
 
@@ -54,10 +54,10 @@ $title = $isEdit ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới';
             <div class="form-group">
                 <label>Vai trò</label>
                 <select name="role">
-                    <option value="admin"        <?= (($old['role'] ?? '') === 'admin' ? 'selected' : '') ?>>Admin</option>
+                    <option value="admin" <?= (($old['role'] ?? '') === 'admin' ? 'selected' : '') ?>>Admin</option>
                     <option value="receptionist" <?= (($old['role'] ?? '') === 'receptionist' ? 'selected' : '') ?>>Lễ tân</option>
-                    <option value="doctor"       <?= (($old['role'] ?? '') === 'doctor' ? 'selected' : '') ?>>Bác sĩ</option>
-                    <option value="patient"      <?= (($old['role'] ?? '') === 'patient' ? 'selected' : '') ?>>Bệnh nhân</option>
+                    <option value="doctor" <?= (($old['role'] ?? '') === 'doctor' ? 'selected' : '') ?>>Bác sĩ</option>
+                    <option value="patient" <?= (($old['role'] ?? '') === 'patient' ? 'selected' : '') ?>>Bệnh nhân</option>
                 </select>
             </div>
 
@@ -75,15 +75,11 @@ $title = $isEdit ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới';
                 <div class="form-group">
                     <label>Mật khẩu <span class="required">*</span></label>
                     <input type="text" name="password" required
-                           value="<?= htmlspecialchars($old['password'] ?? '123456') ?>">
+                        value="<?= htmlspecialchars($old['password'] ?? '123456') ?>">
                     <small class="hint">Hiện tại đang lưu dạng plain-text, sau này có thể chuyển sang mã hóa.</small>
                 </div>
                 <div class="form-group"></div>
             </div>
-        <?php else: ?>
-            <p class="hint">
-                Mật khẩu giữ nguyên. Nếu cần chức năng đổi mật khẩu, mình sẽ làm riêng một màn sau.
-            </p>
         <?php endif; ?>
 
         <div class="form-actions">

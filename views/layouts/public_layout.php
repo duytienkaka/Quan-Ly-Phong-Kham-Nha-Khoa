@@ -6,23 +6,22 @@
 <head>
     <meta charset="UTF-8">
     <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dental Clinic'; ?></title>
-    <link rel="stylesheet" href="/dental_clinic/public/css/public.css">
+    <link rel="stylesheet" href="/dental_clinic/public/css/public.css?v=<?= filemtime(__DIR__.'/../../public/css/public.css') ?>">
 </head>
 <body>
 <header class="site-header">
     <div class="logo">Nha Khoa <span>Smile</span></div>
     <nav class="main-nav">
         <a href="index.php">Trang chủ</a>
-        <a href="#">Dịch vụ</a>
-        <a href="#">Đội ngũ bác sĩ</a>
-        <a href="#">Liên hệ</a>
+        <a href="index.php?controller=home&action=services">Dịch vụ</a>
+        <a href="index.php?controller=home&action=doctors">Đội ngũ bác sĩ</a>
+        <a href="index.php?controller=home&action=contact">Liên hệ</a>
         <a href="index.php?controller=auth&action=login" class="btn-login">Đăng nhập</a>
     </nav>
 </header>
 
 <main class="site-main">
     <?php
-    // chỗ này sẽ nhét homepage hoặc các view khác của Home
     if (isset($view)) {
         include $view;
     }
@@ -31,7 +30,6 @@
 
 <footer class="site-footer">
     <div class="footer-content">
-        <!-- About Section -->
         <div class="footer-section">
             <h3 class="footer-title">Về chúng tôi</h3>
             <div class="footer-logo">Nha Khoa <span>Smile</span></div>

@@ -91,7 +91,7 @@ $showInfo = !$isEditing;
         <div class="stat-card">
             <div class="stat-icon">📅</div>
             <div class="stat-content">
-                <p class="stat-label">Lịch hẹn sắp tới</p>
+                <p class="stat-label">Lịch hẹn</p>
                 <p class="stat-number"><?= htmlspecialchars($upcomingCount ?? 0) ?></p>
             </div>
         </div>
