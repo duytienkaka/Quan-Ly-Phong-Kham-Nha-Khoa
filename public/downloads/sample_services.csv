@@ -1,0 +1,5 @@
+service_name,description,unit_price,unit,is_active
+Nạo vôi răng,"Nạo vôi và đánh bóng",200000,lần,1
+Trám răng,"Trám composite",350000,lần,1
+Tẩy trắng,"Tẩy trắng bằng đèn",1200000,lần,1
+Hàn răng sâu,"Hàn composite",400000,lần,1
