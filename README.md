@@ -164,7 +164,7 @@ Hệ thống quản lý phòng khám nha khoa được xây dựng bằng **PHP 
 - XAMPP / Apache  
 
 ---
-## Cài đặt Database
+## 🔧 Cài đặt Database
 
 ### 1 Tạo database
 
