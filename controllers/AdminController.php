@@ -1876,4 +1876,107 @@ class AdminController
         fclose($output);
         exit;
     }
+    public function reports()
+    {
+        if (empty($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: index.php?controller=auth&action=login');
+            exit;
+        }
+
+        $pdo  = getPDO();
+        $user = User::findById((int)$_SESSION['user_id']);
+
+        $fromDate = $_GET['from_date'] ?? '';
+        $toDate   = $_GET['to_date']   ?? '';
+
+        if ($fromDate === '' || $toDate === '') {
+            $toDate   = date('Y-m-d');
+            $fromDate = date('Y-m-d', strtotime('-30 days'));
+        }
+
+        if ($fromDate > $toDate) {
+            $tmp      = $fromDate;
+            $fromDate = $toDate;
+            $toDate   = $tmp;
+        }
+
+        $sqlDaily = "
+        SELECT
+            DATE(i.created_at) AS d,
+            SUM(i.final_amount) AS revenue
+        FROM invoices i
+        WHERE i.payment_status = 'PAID'
+          AND DATE(i.created_at) BETWEEN :from_date AND :to_date
+        GROUP BY DATE(i.created_at)
+        ORDER BY d ASC
+    ";
+        $stmt = $pdo->prepare($sqlDaily);
+        $stmt->execute([
+            'from_date' => $fromDate,
+            'to_date'   => $toDate,
+        ]);
+        $dailyRevenue = $stmt->fetchAll();
+
+        $totalRevenue = 0;
+        foreach ($dailyRevenue as $row) {
+            $totalRevenue += (float)$row['revenue'];
+        }
+
+        $sqlService = "
+        SELECT
+            s.service_id,
+            s.service_name,
+            s.unit,
+            SUM(ii.quantity)   AS total_qty,
+            SUM(ii.line_total) AS total_revenue
+        FROM invoice_items ii
+        JOIN services s ON ii.service_id = s.service_id
+        JOIN invoices i ON ii.invoice_id = i.invoice_id
+        WHERE i.payment_status = 'PAID'
+          AND DATE(i.created_at) BETWEEN :from_date AND :to_date
+        GROUP BY s.service_id, s.service_name, s.unit
+        ORDER BY total_qty DESC
+        LIMIT 10
+    ";
+        $stmt = $pdo->prepare($sqlService);
+        $stmt->execute([
+            'from_date' => $fromDate,
+            'to_date'   => $toDate,
+        ]);
+        $topServices = $stmt->fetchAll();
+
+        $sqlDoctor = "
+        SELECT
+            udoc.full_name AS doctor_name,
+            SUM(ii.line_total) AS total_revenue,
+            COUNT(DISTINCT i.invoice_id) AS invoice_count
+        FROM invoices i
+        JOIN medical_records mr ON i.record_id = mr.record_id
+        JOIN doctors d          ON mr.doctor_id = d.doctor_id
+        JOIN users udoc         ON d.user_id = udoc.user_id
+        JOIN invoice_items ii   ON ii.invoice_id = i.invoice_id
+        WHERE i.payment_status = 'PAID'
+          AND DATE(i.created_at) BETWEEN :from_date AND :to_date
+        GROUP BY udoc.user_id, udoc.full_name
+        ORDER BY total_revenue DESC
+    ";
+        $stmt = $pdo->prepare($sqlDoctor);
+        $stmt->execute([
+            'from_date' => $fromDate,
+            'to_date'   => $toDate,
+        ]);
+        $doctorRevenue = $stmt->fetchAll();
+
+        $pageTitle        = 'Báo cáo / Thống kê doanh thu';
+        $view             = __DIR__ . '/../views/admin/reports.php';
+        $userView         = $user;
+        $fromDateView     = $fromDate;
+        $toDateView       = $toDate;
+        $dailyRevenueView = $dailyRevenue;
+        $totalRevenueView = $totalRevenue;
+        $topServicesView  = $topServices;
+        $doctorRevenueView = $doctorRevenue;
+
+        include __DIR__ . '/../views/layouts/admin_layout.php';
+    }
 }

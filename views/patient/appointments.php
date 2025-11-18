@@ -48,39 +48,76 @@
                         <th>Buổi</th>
                         <th>Trạng thái</th>
                         <th>Ghi chú</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($appointments as $a): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($a['appointment_date']) ?></td>
-                        <td>
-                            <?php
-                            switch ($a['time_block']) {
-                                case 'MORNING': echo 'Sáng'; break;
-                                case 'AFTERNOON': echo 'Chiều'; break;
-                                case 'EVENING': echo 'Tối'; break;
-                                default: echo htmlspecialchars($a['time_block']);
-                            }
-                            ?>
-                        </td>
-                        <td>
-                            <?php
-                            $statusClass = 'badge';
-                            switch ($a['status']) {
-                                case 'WAITING':    $label = 'Đang chờ'; $statusClass .= ' badge-waiting'; break;
-                                case 'IN_PROGRESS':$label = 'Đang khám'; $statusClass .= ' badge-info'; break;
-                                case 'COMPLETED':  $label = 'Hoàn thành'; $statusClass .= ' badge-success'; break;
-                                case 'CANCELLED':  $label = 'Đã hủy'; $statusClass .= ' badge-muted'; break;
-                                case 'NO_SHOW':    $label = 'Không đến'; $statusClass .= ' badge-muted'; break;
-                                default:           $label = htmlspecialchars($a['status']);
-                            }
-                            ?>
-                            <span class="<?= $statusClass ?>"><?= $label ?></span>
-                        </td>
-                        <td><?= htmlspecialchars($a['note'] ?? '') ?></td>
-                    </tr>
-                <?php endforeach; ?>
+                    <?php foreach ($appointments as $a): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($a['appointment_date']) ?></td>
+                            <td>
+                                <?php
+                                switch ($a['time_block']) {
+                                    case 'MORNING':
+                                        echo 'Sáng';
+                                        break;
+                                    case 'AFTERNOON':
+                                        echo 'Chiều';
+                                        break;
+                                    case 'EVENING':
+                                        echo 'Tối';
+                                        break;
+                                    default:
+                                        echo htmlspecialchars($a['time_block']);
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php
+                                $statusClass = 'badge';
+                                switch ($a['status']) {
+                                    case 'WAITING':
+                                        $label = 'Đang chờ';
+                                        $statusClass .= ' badge-waiting';
+                                        break;
+                                    case 'IN_PROGRESS':
+                                        $label = 'Đang khám';
+                                        $statusClass .= ' badge-info';
+                                        break;
+                                    case 'COMPLETED':
+                                        $label = 'Hoàn thành';
+                                        $statusClass .= ' badge-success';
+                                        break;
+                                    case 'CANCELLED':
+                                        $label = 'Đã hủy';
+                                        $statusClass .= ' badge-muted';
+                                        break;
+                                    case 'NO_SHOW':
+                                        $label = 'Không đến';
+                                        $statusClass .= ' badge-muted';
+                                        break;
+                                    default:
+                                        $label = htmlspecialchars($a['status']);
+                                }
+                                ?>
+                                <span class="<?= $statusClass ?>"><?= $label ?></span>
+                            </td>
+                            <td><?= htmlspecialchars($a['note'] ?? '') ?></td>
+                            <td>
+                                <?php if ($a['status'] === 'WAITING'): ?>
+                                    <form method="post"
+                                        action="index.php?controller=patient&action=cancelAppointment"
+                                        style="display:inline-block;"
+                                        onsubmit="return confirm('Bạn chắc chắn muốn hủy lịch hẹn này?');">
+                                        <input type="hidden" name="appointment_id" value="<?= $a['appointment_id'] ?>">
+                                        <button class="btn " style = "background-color: red;">
+                                            Hủy
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>

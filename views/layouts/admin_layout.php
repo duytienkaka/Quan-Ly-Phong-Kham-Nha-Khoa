@@ -33,6 +33,7 @@
                 <li><a href="index.php?controller=admin&action=patients">Bệnh nhân</a></li>
                 <li><a href="index.php?controller=admin&action=services">Dịch vụ / Giá</a></li>
                 <li><a href="index.php?controller=admin&action=invoices">Hóa đơn</a></li>
+                <li><a href="index.php?controller=admin&action=reports">Báo cáo / Thống kê</a></li>
                 <li><a href="index.php?controller=admin&action=backup">Sao lưu / Export Excel</a></li>
             </ul>
         </aside>

@@ -113,7 +113,6 @@ function rc_status_class($st)
         </div>
     </div>
 
-    <!-- ====== PANEL GÁN BÁC SĨ & CẬP NHẬT TRẠNG THÁI (GIỮ CODE CŨ) ====== -->
     <div class="rc-panel">
         <div class="rc-panel-header">
             <h2>Gán bác sĩ & Cập nhật trạng thái</h2>
@@ -137,6 +136,7 @@ function rc_status_class($st)
                             </option>
                         <?php endforeach; ?>
                     </select>
+                    <small style = "margin-top: 5px;"><i>Nếu bệnh nhân không đến thì không gán cho Bác sĩ</i></small>
                 </div>
 
                 <div class="form-group">

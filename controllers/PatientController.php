@@ -32,9 +32,8 @@ class PatientController
             }
         }
 
-        $isEditing = false; // đang xem bình thường
+        $isEditing = false;
 
-        // Thống kê nhanh (Quick stats)
         $upcomingCount      = 0;
         $recordsCount       = 0;
         $unpaidInvoicesCount = 0;
@@ -44,7 +43,6 @@ class PatientController
             $patientId = $patient['patient_id'];
             $today     = date('Y-m-d');
 
-            // upcoming appointments (today or later)
             $sql = "SELECT COUNT(*)
                     FROM appointments
                     WHERE patient_id = :pid
@@ -118,7 +116,6 @@ class PatientController
         try {
             $pdo->beginTransaction();
 
-            // 1) Update bảng users
             $stmt = $pdo->prepare("
                 UPDATE users
                 SET full_name = :full_name,
@@ -134,7 +131,6 @@ class PatientController
                 'uid'       => $userId,
             ]);
 
-            // 2) Insert/Update bảng patients
             $stmt = $pdo->prepare("SELECT patient_id FROM patients WHERE user_id = :uid");
             $stmt->execute(['uid' => $userId]);
             $patient = $stmt->fetch();
@@ -272,10 +268,59 @@ class PatientController
         $startItem    = $totalRows > 0 ? ($offset + 1) : 0;
         $endItem      = $totalRows > 0 ? min($totalRows, $offset + $pageSize) : 0;
 
-        // truyền thêm successQueue cho view
         $successQueueView = $successQueue;
 
         include __DIR__ . '/../views/layouts/patient_layout.php';
+    }
+    public function cancelAppointment()
+    {
+        $this->requirePatientLogin();
+        $pdo = getPDO();
+
+        $userId = $_SESSION['user_id'];
+
+        $stmt = $pdo->prepare("SELECT patient_id FROM patients WHERE user_id = :uid");
+        $stmt->execute(['uid' => $userId]);
+        $patient = $stmt->fetch();
+
+        if (!$patient) {
+            die("Không tìm thấy bệnh nhân.");
+        }
+
+        $appointmentId = (int)($_POST['appointment_id'] ?? 0);
+        if ($appointmentId <= 0) {
+            die("Mã lịch hẹn không hợp lệ.");
+        }
+
+        $stmt = $pdo->prepare("
+        SELECT status FROM appointments
+        WHERE appointment_id = :id AND patient_id = :pid
+    ");
+        $stmt->execute([
+            'id' => $appointmentId,
+            'pid' => $patient['patient_id'],
+        ]);
+        $ap = $stmt->fetch();
+
+        if (!$ap) {
+            die("Lịch hẹn không tồn tại.");
+        }
+
+        if ($ap['status'] !== 'WAITING') {
+            die("Bạn chỉ có thể hủy lịch hẹn đang ở trạng thái CHỜ DUYỆT.");
+        }
+
+        // Hủy lịch
+        $stmt = $pdo->prepare("
+        UPDATE appointments
+        SET status = 'CANCELLED',
+            note = CONCAT(IFNULL(note,''), '\n[BN hủy]: bệnh nhân tự hủy lịch vào ', NOW())
+        WHERE appointment_id = :id
+    ");
+        $stmt->execute(['id' => $appointmentId]);
+
+        header("Location: index.php?controller=patient&action=appointments");
+        exit;
     }
 
     public function booking()
@@ -286,7 +331,6 @@ class PatientController
         $user    = User::findById($userId);
         $patient = Patient::findByUserId($userId);
 
-        // Nếu chưa có hồ sơ bệnh nhân thì bắt điền info trước
         if (!$patient) {
             header('Location: index.php?controller=patient&action=dashboard');
             exit;

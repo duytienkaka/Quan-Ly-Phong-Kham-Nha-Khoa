@@ -136,6 +136,4 @@
             ← Quay lại danh sách
         </a>
     </div>
-    </form>
-    </div>
 </section>
