@@ -218,5 +218,11 @@ http://localhost/dental_clinic/
 │── /database
 └── README.md
 ```
-
 ---
+
+# 📋 Thành viên dự án
+
+| Họ và Tên             | Vai trò    |
+|-----------------------|------------|
+| **Phạm Đức Duy Tiến** | Thành viên |
+| **Dương Văn Việt**    | Thành viên |
