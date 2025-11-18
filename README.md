@@ -189,7 +189,3 @@ http://localhost/dental_clinic/
 ```
 
 ---
-
-# ✨ Thành viên thực hiện
-- **Phạm Đức Duy Tiến**  
-- **Dương Văn Việt**
