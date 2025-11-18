@@ -33,14 +33,13 @@ Hệ thống gồm các bảng:
 - `users`
 - `patients`
 - `doctors`
-- `receptionists`
+- `doctor_schedule`
 - `appointments`
 - `medical_records`
+- `medical_records_details`
 - `services`
 - `invoices`
 - `invoice_items`
-- `audit_logs`
-- `backup_logs`
 
 ---
 
@@ -168,7 +167,7 @@ Chỉ hiển thị:
 
 # 👨‍💻 3. Công nghệ sử dụng
 - PHP (MVC)
-- MySQL / MariaDB
+- MySQL
 - HTML / CSS / JS
 - XAMPP / Apache
 

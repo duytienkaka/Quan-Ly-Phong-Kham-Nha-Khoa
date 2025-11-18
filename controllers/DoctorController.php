@@ -584,14 +584,10 @@ class DoctorController
         $this->requireDoctorLogin();
         $pdo = getPDO();
 
-        // Lấy user hiện tại
-        $doctorUserId = (int)$_SESSION['user_id'];
-        $doctorUser   = User::findById($doctorUserId);
-
-        // Lấy appointment_id từ form (hidden)
+        // Lấy appointment_id từ form
         $appointmentId = isset($_POST['appointment_id'])
             ? (int)$_POST['appointment_id']
-            : (int)($_GET['id'] ?? 0);
+            : 0;
 
         if ($appointmentId <= 0) {
             die('Mã lịch hẹn không hợp lệ khi lưu hóa đơn.');
@@ -609,7 +605,6 @@ class DoctorController
         $rec = $stmtRec->fetch();
 
         if (!$rec) {
-            // Chưa có hồ sơ khám => không cho tạo hóa đơn
             die('Chưa có hồ sơ khám cho lịch hẹn này. Vui lòng lưu hồ sơ khám trước.');
         }
 
@@ -617,7 +612,7 @@ class DoctorController
         $patientId = (int)$rec['patient_id'];
 
         // Dữ liệu từ form
-        $quantities = $_POST['quantities'] ?? [];        // mảng service_id => qty
+        $quantities = $_POST['quantities'] ?? [];        // service_id => qty
         $discount   = (float)($_POST['discount'] ?? 0);  // giảm giá
         $note       = trim($_POST['invoice_note'] ?? '');
 
@@ -640,16 +635,16 @@ class DoctorController
             $invoice = $stmtInv->fetch();
 
             if ($invoice) {
-                // Đã có hóa đơn: xoá item cũ để insert lại theo form mới
                 $invoiceId = (int)$invoice['invoice_id'];
 
+                // Xoá item cũ để insert lại
                 $stmtDelItems = $pdo->prepare("
                 DELETE FROM invoice_items
                 WHERE invoice_id = :iid
             ");
                 $stmtDelItems->execute(['iid' => $invoiceId]);
             } else {
-                // Chưa có hóa đơn: tạo mới với total = 0, final = 0
+                // Tạo hóa đơn mới (tạm total = 0, final = 0)
                 $stmtInsInv = $pdo->prepare("
                 INSERT INTO invoices
                     (record_id, patient_id,
@@ -671,9 +666,27 @@ class DoctorController
                 $invoiceId = (int)$pdo->lastInsertId();
             }
 
-            // 2) Insert lại các dòng invoice_items theo dịch vụ đã chọn
+            // 2) Insert lại invoice_items
             $total = 0;
 
+            // Chuẩn bị statement lấy dịch vụ
+            $stmtSvc = $pdo->prepare("
+            SELECT service_id, unit_price
+            FROM services
+            WHERE service_id = :sid
+              AND is_active = 1
+            LIMIT 1
+        ");
+
+            // Chuẩn bị statement insert item
+            $stmtItem = $pdo->prepare("
+                INSERT INTO invoice_items
+                    (invoice_id, service_id, quantity,
+                    unit_price, line_total)
+                VALUES
+                    (:iid, :sid, :qty,
+                    :uprice, :ltotal)
+            ");
             foreach ($quantities as $serviceId => $qty) {
                 $serviceId = (int)$serviceId;
                 $qty       = (int)$qty;
@@ -683,32 +696,17 @@ class DoctorController
                 }
 
                 // Lấy thông tin dịch vụ
-                $stmtSvc = $pdo->prepare("
-                SELECT service_id, price
-                FROM services
-                WHERE service_id = :sid
-                LIMIT 1
-            ");
                 $stmtSvc->execute(['sid' => $serviceId]);
                 $svc = $stmtSvc->fetch();
-
                 if (!$svc) {
-                    continue; // dịch vụ không tồn tại
+                    continue;
                 }
 
-                $unitPrice = (float)$svc['price'];
+                $unitPrice = (float)$svc['unit_price'];
                 $lineTotal = $unitPrice * $qty;
                 $total    += $lineTotal;
 
-                // Thêm dòng chi tiết hóa đơn
-                $stmtItem = $pdo->prepare("
-                INSERT INTO invoice_items
-                    (invoice_id, service_id, quantity,
-                     unit_price, line_total, created_at)
-                VALUES
-                    (:iid, :sid, :qty,
-                     :uprice, :ltotal, NOW())
-            ");
+                // Thêm chi tiết hóa đơn
                 $stmtItem->execute([
                     'iid'    => $invoiceId,
                     'sid'    => $serviceId,
@@ -718,7 +716,9 @@ class DoctorController
                 ]);
             }
 
-            // 3) Cập nhật lại tổng tiền trong bảng invoices
+            // 3) Cập nhật lại tổng tiền invoices
+            if ($discount < 0) $discount = 0;
+            if ($discount > $total) $discount = $total;
             $final = max(0, $total - $discount);
 
             $stmtUpInv = $pdo->prepare("
@@ -739,7 +739,6 @@ class DoctorController
 
             $pdo->commit();
 
-            // Quay lại màn chi tiết lịch hẹn bác sĩ
             header('Location: index.php?controller=doctor&action=appointmentDetail&id=' . $appointmentId);
             exit;
         } catch (Exception $e) {

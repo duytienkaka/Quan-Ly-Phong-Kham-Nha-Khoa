@@ -20,28 +20,31 @@ class AuthController
 
                 // TẠM: so sánh plain text
                 if ($user && $user['password_hash'] === $password) {
-                    $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['role']    = $user['role'];
+                    if($user['status'] === 1){
+                        $_SESSION['user_id'] = $user['user_id'];
+                        $_SESSION['role']    = $user['role'];
 
-                    // redirect theo role
-                    switch ($user['role']) {
-                        case 'patient':
-                            header('Location: index.php?controller=patient&action=dashboard');
-                            break;
-                        case 'admin':
-                            header('Location: index.php?controller=admin&action=dashboard');
-                            break;
-                        case 'receptionist':
-                            header('Location: index.php?controller=receptionist&action=dashboard');
-                            break;
-                        case 'doctor':
-                            header('Location: index.php?controller=doctor&action=dashboard');
-                            break;
-                        default:
-                            header('Location: index.php');
-                            break;
-                    }
-                    exit;
+                        switch ($user['role']) {
+                            case 'patient':
+                                header('Location: index.php?controller=patient&action=dashboard');
+                                break;
+                            case 'admin':
+                                header('Location: index.php?controller=admin&action=dashboard');
+                                break;
+                            case 'receptionist':
+                                header('Location: index.php?controller=receptionist&action=dashboard');
+                                break;
+                            case 'doctor':
+                                header('Location: index.php?controller=doctor&action=dashboard');
+                                break;
+                            default:
+                                header('Location: index.php');
+                                break;
+                        }
+                        exit;
+                        }else{
+                            $error = "Tài khoản của bạn đã bị khóa! Hãy đến phòng khám để đưa ra lý do và mở tài khoản.";
+                        }
                 } else {
                     $error = 'Sai tên đăng nhập hoặc mật khẩu.';
                 }

@@ -359,7 +359,7 @@ class AdminController
             exit;
         }
 
-        $newStatus = ($user['status'] == 1) ? 0 : 1;
+        $newStatus = ($user['status'] == 0) ? 1 : 0;
 
         $stmt = $pdo->prepare("UPDATE users SET status = :s WHERE user_id = :id");
         $stmt->execute(['s' => $newStatus, 'id' => $id]);

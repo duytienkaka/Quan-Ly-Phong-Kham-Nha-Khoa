@@ -207,8 +207,8 @@ $ap = $appointmentView;
             <?php endif; ?>
 
             <form method="post" class="form-card" id="invoice-form" action="index.php?controller=doctor&action=saveInvoice">
+                <input type="hidden" name="appointment_id" value="<?= (int)$ap['appointment_id'] ?>">
                 <input type="hidden" name="action_type" value="save_invoice">
-
                 <!-- Chọn dịch vụ + số lượng -->
                 <div class="form-group">
                     <label>Chọn dịch vụ đã thực hiện</label>
@@ -231,7 +231,7 @@ $ap = $appointmentView;
                             placeholder="Số lượng">
 
                         <button type="button" class="btn-secondary bt" onclick="addServiceRow()">
-                            Thêm 
+                            Thêm
                         </button>
                     </div>
                     <small>Chọn từng dịch vụ, nhập số lượng rồi bấm "Thêm".</small>
@@ -366,8 +366,8 @@ $ap = $appointmentView;
                     qty
                 }
             }
-        renderServiceTable();
-        recalculateTotal();
+            renderServiceTable();
+            recalculateTotal();
         }
 
         function removeService(svcId) {
