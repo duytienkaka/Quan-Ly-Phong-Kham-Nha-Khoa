@@ -169,15 +169,15 @@ Hệ thống quản lý phòng khám nha khoa được xây dựng bằng **PHP 
 ### 1 Tạo database
 
 ``` sql
-CREATE DATABASE clinic_management CHARACTER SET utf8mb4;
+CREATE DATABASE dental_clinic CHARACTER SET utf8mb4;
 ```
 
 ### 2 Import file SQL
 
-Vào phpMyAdmin → chọn database **clinic_management** → Import → chọn
+Vào phpMyAdmin → chọn database **dental_clinic** → Import → chọn
 file:
 
-    database/clinic_management.sql
+    database/dental_clinic.sql
 
 ### 3 Cập nhật cấu hình kết nối
 
@@ -189,7 +189,7 @@ Sửa thông tin:
 
 ``` php
 $host = 'localhost';
-$db   = 'clinic_management';
+$db   = 'dental_clinic';
 $user = 'root';
 $pass = '';
 ```
@@ -209,7 +209,7 @@ http://localhost/dental_clinic/
 
 # 🗂 Cấu trúc thư mục
 ```
-/clinic_management
+/dental_clinic
 │── /config
 │── /controllers
 │── /models
