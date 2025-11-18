@@ -164,6 +164,37 @@ Hệ thống quản lý phòng khám nha khoa được xây dựng bằng **PHP 
 - XAMPP / Apache  
 
 ---
+## Cài đặt Database
+
+### 1 Tạo database
+
+``` sql
+CREATE DATABASE clinic_management CHARACTER SET utf8mb4;
+```
+
+### 2 Import file SQL
+
+Vào phpMyAdmin → chọn database **clinic_management** → Import → chọn
+file:
+
+    database/clinic_management.sql
+
+### 3 Cập nhật cấu hình kết nối
+
+Mở:
+
+    config/db.php
+
+Sửa thông tin:
+
+``` php
+$host = 'localhost';
+$db   = 'clinic_management';
+$user = 'root';
+$pass = '';
+```
+
+------------------------------------------------------------------------
 
 # 🧪 Hướng dẫn chạy
 1. Copy source vào `htdocs/`  
