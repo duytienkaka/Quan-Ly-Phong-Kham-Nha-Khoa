@@ -1,5 +1,5 @@
 <?php
-// $pageTitle, $view, $user (User::findById) được truyền từ controller
+
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -8,8 +8,7 @@
     <title><?= htmlspecialchars($pageTitle ?? 'Lễ tân - Nha khoa') ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CSS riêng cho lễ tân -->
-    <link rel="stylesheet" href="public/css/receptionist.css">
+    <link rel="stylesheet" href="public/css/receptionist.css?v=16">
 </head>
 <body class="receptionist-body">
 
@@ -62,11 +61,7 @@
 </footer>
 </footer>
 
-<!-- Toast container (used by receptionist JS) -->
 <div id="rc-toast-container" aria-live="polite" aria-atomic="true"></div>
-
-<!-- Receptionist scripts -->
-<script src="public/js/receptionist.js"></script>
 
 </body>
 </html>

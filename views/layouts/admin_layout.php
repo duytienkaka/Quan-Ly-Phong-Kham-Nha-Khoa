@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle ?? 'Admin') ?></title>
-    <link rel="stylesheet" href="/dental_clinic/public/css/public.css">
-    <link rel="stylesheet" href="/dental_clinic/public/css/admin.css">
+    <link rel="stylesheet" href="public/css/public.css">
+    <link rel="stylesheet" href="public/css/admin.css">
 </head>
 
 <body>

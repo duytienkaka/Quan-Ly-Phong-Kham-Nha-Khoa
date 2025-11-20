@@ -101,7 +101,7 @@
                                 }
                             ?>
                         </td>
-                        <td>
+                        <td class="invoice-status-cell">
                             <?php
                                 $ps = $inv['payment_status'];
                                 if     ($ps === 'UNPAID')  echo '<span class="tag tag-pending">Chưa thanh toán</span>';
@@ -110,9 +110,7 @@
                                 else                      echo '<span class="tag">'.htmlspecialchars($ps).'</span>';
                             ?>
                         </td>
-
-                        <!-- Form cập nhật thanh toán cho từng hóa đơn -->
-                        <td>
+                        <td class="invoice-update-cell">
                             <form method="post"
                                   action="index.php?controller=receptionist&action=invoices"
                                   class="inline-form">

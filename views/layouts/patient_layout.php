@@ -7,8 +7,8 @@
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle ?? 'Patient') ?></title>
-    <link rel="stylesheet" href="/dental_clinic/public/css/public.css?v=<?= filemtime(__DIR__ . '/../../public/css/public.css') ?>">
-    <link rel="stylesheet" href="/dental_clinic/public/css/patient.css?v=<?= filemtime(__DIR__ . '/../../public/css/patient.css') ?>">
+    <link rel="stylesheet" href="public/css/public.css">
+    <link rel="stylesheet" href="public/css/patient.css">
 </head>
 
 <body>

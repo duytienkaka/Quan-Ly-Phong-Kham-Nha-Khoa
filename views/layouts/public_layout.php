@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dental Clinic'; ?></title>
-    <link rel="stylesheet" href="/dental_clinic/public/css/public.css?v=<?= filemtime(__DIR__.'/../../public/css/public.css') ?>">
+    <link rel="stylesheet" href="public/css/public.css">
 </head>
 <body>
 <header class="site-header">

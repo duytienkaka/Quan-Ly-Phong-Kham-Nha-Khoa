@@ -1,5 +1,4 @@
 <?php
-// $pageTitle, $view, $userView được set từ controller
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -7,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle ?? 'Bác sĩ') ?></title>
-    <link rel="stylesheet" href="/dental_clinic/public/css/doctor.css?v=<?= filemtime(__DIR__ . '/../../public/css/doctor.css') ?>">
+    <link rel="stylesheet" href="public/css/doctor.css">
 </head>
 
 <body class="doctor-body">
