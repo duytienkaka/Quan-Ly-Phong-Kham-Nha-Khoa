@@ -1,7 +1,7 @@
 <section class="rc-dashboard">
     <h1>Tạo lịch hẹn mới</h1>
     <p class="rc-subtitle">
-        Lễ tân có thể chọn bệnh nhân đã có hoặc tạo nhanh hồ sơ bệnh nhân mới rồi đặt lịch.
+        Tạo lịch hẹn thủ công giúp người mới chưa có tài khoản.
     </p>
 
     <?php if (!empty($errorView)): ?>
@@ -53,7 +53,6 @@
                 </small>
             </div>
 
-            <!-- PANEL BỆNH NHÂN MỚI -->
             <div id="newPatientPanel" class="rc-subpanel <?= $mode === 'new' ? 'visible' : 'hidden' ?>">
                 <h3>Bệnh nhân mới (tùy chọn)</h3>
 
@@ -90,7 +89,6 @@
                     <textarea name="new_note" rows="2"><?= htmlspecialchars($_POST['new_note'] ?? '') ?></textarea>
                 </div>
             </div>
-            <!-- HẾT PANEL BỆNH NHÂN MỚI -->
 
             <hr class="rc-divider">
 

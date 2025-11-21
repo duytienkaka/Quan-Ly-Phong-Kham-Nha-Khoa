@@ -69,6 +69,7 @@
                 <table class="rc-table" role="table">
                     <thead>
                         <tr>
+                            <th>Số TT</th>
                             <th>Ngày / Buổi</th>
                             <th>Bệnh nhân</th>
                             <th>Bác sĩ</th>
@@ -80,6 +81,7 @@
                     <tbody>
                         <?php foreach ($appointmentsView as $a): ?>
                             <tr>
+                                <td data-label="Số TT"><?php echo $a['queue_number'] ?></td>
                                 <td data-label="Ngày / Buổi">
                                     <?php
                                     $dt = strtotime($a['appointment_date']);

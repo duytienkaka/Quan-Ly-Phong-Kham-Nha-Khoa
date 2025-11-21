@@ -8,7 +8,7 @@
     <title><?= htmlspecialchars($pageTitle ?? 'Lễ tân - Nha khoa') ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="public/css/receptionist.css?v=16">
+    <link rel="stylesheet" href="public/css/receptionist.css?v=20">
 </head>
 <body class="receptionist-body">
 
@@ -41,7 +41,6 @@
         <span class="rc-user-name">
             <?= htmlspecialchars($user['full_name'] ?? $user['username'] ?? 'Lễ tân') ?>
         </span>
-        <a href="index.php" class="rc-header-link">Trang chủ</a>
         <a href="index.php?controller=auth&action=login" class="rc-header-link">Đăng xuất</a>
     </div>
 </header>

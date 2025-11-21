@@ -278,7 +278,6 @@ class ReceptionistController
         $error   = '';
         $success = '';
 
-        // danh sách bệnh nhân có sẵn
         $stmt = $pdo->query("
             SELECT patient_id, full_name, phone
             FROM patients
@@ -291,7 +290,6 @@ class ReceptionistController
             $mode       = $_POST['patient_mode'] ?? 'existing';
             $patient_id = 0;
 
-            // bệnh nhân có sẵn
             if ($mode === 'existing') {
                 $patient_id = (int)($_POST['patient_id'] ?? 0);
                 if ($patient_id <= 0) {
@@ -299,7 +297,6 @@ class ReceptionistController
                 }
             }
 
-            // bệnh nhân mới
             if ($mode === 'new') {
                 $full_name = trim($_POST['new_full_name'] ?? '');
                 $phone     = trim($_POST['new_phone'] ?? '');
@@ -328,7 +325,6 @@ class ReceptionistController
                 }
             }
 
-            // thông tin lịch hẹn
             $date   = trim($_POST['date'] ?? '');
             $time   = trim($_POST['time'] ?? '');
             $note   = trim($_POST['note'] ?? '');
@@ -340,7 +336,6 @@ class ReceptionistController
                 } else {
                     $appointmentDateTime = $date . ' ' . $time . ':00';
 
-                    // Tính queue_number tiếp theo cho ngày đó
                     $stmtQ = $pdo->prepare("
                         SELECT MAX(queue_number)
                         FROM appointments
@@ -365,7 +360,7 @@ class ReceptionistController
                     ]);
 
                     $success = 'Đã tạo lịch hẹn mới. Số thứ tự: #' . $nextQueue;
-                    $_POST   = []; // reset form
+                    $_POST   = [];
                 }
             }
         }
@@ -743,7 +738,6 @@ class ReceptionistController
             exit;
         }
 
-        // ✅ LẤY CHI TIẾT invoice_items
         $sqlItems = "
         SELECT
             ii.quantity,
