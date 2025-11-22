@@ -1,22 +1,24 @@
+<h2 align="center">
+    <a href="https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin">
+    🎓 Faculty of Information Technology (DaiNam University)
+    </a>
+</h2>
+<h2 align="center">
+    XÂY DỰNG ỨNG DỤNG WEB QUẢN LÝ PHÒNG KHÁM NHA KHOA
+</h2>
+<div align="center">
+    <p align="center">
+        <img src="public\images\logo1.png" alt="AIoTLab Logo" width="170"/>
+        <img src="public\images\logo2.png" alt="AIoTLab Logo" width="180"/>
+        <img src="public\images\logo3.png" alt="DaiNam University Logo" width="200"/>
+    </p>
 
-# 🏫 Faculty of Information Technology (DaiNam University)
+[![AIoTLab](https://img.shields.io/badge/AIoTLab-green?style=for-the-badge)](https://www.facebook.com/DNUAIoTLab)
+[![Faculty of Information Technology](https://img.shields.io/badge/Faculty%20of%20Information%20Technology-blue?style=for-the-badge)](https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin)
+[![DaiNam University](https://img.shields.io/badge/DaiNam%20University-orange?style=for-the-badge)](https://dainam.edu.vn)
 
-# **XÂY DỰNG ỨNG DỤNG WEB QUẢN LÝ PHÒNG KHÁM NHA KHOA**
-
-<div style="background:#0b1220;padding:26px 12px;border-radius:8px;text-align:center;">
-  <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap;">
-    <img src="public/images/logo1.png" alt="logo1" style="height:110px;object-fit:contain;" />
-    <img src="public/images/logo2.png" alt="logo2" style="height:110px;object-fit:contain;" />
-    <img src="public/images/logo3.png" alt="logo3" style="height:110px;object-fit:contain;" />
-  </div>
-
-  <div style="margin-top:14px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;">
-    <a href="https://www.facebook.com/DNUAIoTLab" target="_blank" rel="noopener" style="display:inline-block;padding:10px 20px;background:#9ed84a;color:#081b00;text-decoration:none;font-weight:800;border-radius:4px;text-transform:uppercase;font-size:13px;">AIOTLAB</a>
-    <a href="https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin" target="_blank" rel="noopener" style="display:inline-block;padding:10px 20px;background:#1976d2;color:#ffffff;text-decoration:none;font-weight:800;border-radius:4px;text-transform:uppercase;font-size:13px;">FACULTY OF INFORMATION TECHNOLOGY</a>
-    <a href="https://dainam.edu.vn/vi" target="_blank" rel="noopener" style="display:inline-block;padding:10px 20px;background:#ff8a3d;color:#ffffff;text-decoration:none;font-weight:800;border-radius:4px;text-transform:uppercase;font-size:13px;">DAINAM UNIVERSITY</a>
-  </div>
 </div>
-
+ 
 ---
 
 # 1. 📘 Giới thiệu
@@ -239,6 +241,7 @@ An toàn & bảo mật:
 │── /public
 │── /database
 └── README.md
+└── index.php
 ```
 
 ---
