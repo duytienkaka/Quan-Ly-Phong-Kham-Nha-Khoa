@@ -1,10 +1,19 @@
 
 # 🏫 Faculty of Information Technology (DaiNam University)
 
-# **Youth Union Member Management**
+# **XÂY DỰNG ỨNG DỤNG WEB QUẢN LÝ PHÒNG KHÁM NHA KHOA**
 
 <p align="center">
-  <img src="public\images\logo.png" width="600">
+  <img src="public\images\logo1.png" width="600">
+  <img src="public\images\logo2.png" width="600">
+  <img src="public\images\logo3.png" width="600">
+</p>
+
+<p align="center" style="margin-top:12px;">
+  <!-- Three quick link buttons. Replace href values with your target URLs. -->
+  <a href="https://www.facebook.com/DNUAIoTLab" style="display:inline-block;margin:6px 8px;padding:10px 18px;border-radius:6px;background:#7ed957;color:#0b2b00;text-decoration:none;font-weight:700;">AIOTLAB</a>
+  <a href="https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin" style="display:inline-block;margin:6px 8px;padding:10px 18px;border-radius:6px;background:#1f8fe6;color:#fff;text-decoration:none;font-weight:700;">FACULTY OF INFORMATION TECHNOLOGY</a>
+  <a href="https://dainam.edu.vn/vi" style="display:inline-block;margin:6px 8px;padding:10px 18px;border-radius:6px;background:#ff8a3d;color:#fff;text-decoration:none;font-weight:700;">DAINAM UNIVERSITY</a>
 </p>
 
 ---
