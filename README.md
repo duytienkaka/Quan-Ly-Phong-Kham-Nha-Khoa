@@ -1,215 +1,227 @@
-# 🦷 HỆ THỐNG QUẢN LÝ PHÒNG KHÁM NHA KHOA – README
 
-## 📌 Giới thiệu
-Hệ thống quản lý phòng khám nha khoa được xây dựng bằng **PHP MVC thuần**, **MySQL**, và sử dụng **HTML/CSS/JS** cho giao diện.  
-Ứng dụng mô phỏng đầy đủ quy trình vận hành của phòng khám: **đặt lịch**, **lễ tân xử lý**, **bác sĩ khám bệnh**, **tạo & thanh toán hóa đơn**, và **thống kê doanh thu**.
+# 🏫 Faculty of Information Technology (DaiNam University)
 
-Ứng dụng có 4 nhóm người dùng chính: **Admin**, **Lễ tân**, **Bác sĩ**, **Bệnh nhân**.
+# **Youth Union Member Management**
 
----
-
-# 🎯 Mục tiêu hệ thống
-- Số hóa quy trình tiếp nhận bệnh nhân.
-- Tối ưu lịch hẹn, phân bổ bác sĩ hợp lý.
-- Hạn chế sai sót khi ghi hồ sơ khám.
-- Tự động hóa tạo hóa đơn và báo cáo doanh thu.
-- Quản lý người dùng theo vai trò (Role-based Access Control).
+<p align="center">
+  <img src="public\images\logo.png" width="600">
+</p>
 
 ---
 
-# 🧩 Role hệ thống
+# 1. 📘 Giới thiệu
 
-| Role | Mô tả |
-|------|-------|
-| **Admin** | Quản trị toàn hệ thống, người dùng, dịch vụ, thống kê, sao lưu |
-| **Lễ tân** | Tạo & quản lý lịch hẹn, gọi số thứ tự, gán bác sĩ |
-| **Bác sĩ** | Khám bệnh, ghi hồ sơ, chọn dịch vụ, tạo hóa đơn |
-| **Bệnh nhân** | Đăng ký, đặt lịch, xem lịch, hồ sơ khám & hóa đơn |
+Hệ thống quản lý phòng khám nha khoa được xây dựng nhằm mô phỏng đầy đủ quy trình hoạt động thực tế của phòng khám:
+- Đặt lịch khám
+- Xử lý lịch hẹn bởi lễ tân
+- Bác sĩ khám bệnh, ghi hồ sơ
+- Tạo và thanh toán hóa đơn
+- Thống kê doanh thu
 
----
-
-# 🗂️ Cơ sở dữ liệu chính
-
-- `users`
-- `patients`
-- `doctors`
-- `doctor_schedule`
-- `appointments`
-- `medical_records`
-- `services`
-- `invoices`
-- `invoice_items`
-
+Ứng dụng bao gồm 4 nhóm người dùng chính:  
+**Admin – Lễ tân – Bác sĩ – Bệnh nhân**
 
 ---
 
-# 🔥 1. Chức năng chi tiết theo vai trò
+# 2. 🛠 Các công nghệ được sử dụng
 
-# 👑 I. ADMIN
-## 1. Quản lý người dùng
-- Tạo / sửa / xóa tài khoản  
-- Phân quyền  
-- Reset mật khẩu  
-- Khóa / mở khóa tài khoản  
+### **Hệ điều hành**
+| macOS | Windows | Ubuntu |
+|-------|----------|---------|
 
-## 2. Quản lý dịch vụ
-- CRUD dịch vụ  
-- Import dịch vụ từ Excel  
-- Kích hoạt / vô hiệu hóa dịch vụ  
+### **Công nghệ chính**
+| PHP | HTML5 | CSS | SCSS | JavaScript|
+|-----|-------|-----|-------|------------|
 
-## 3. Quản lý nhân sự
-- Thêm bác sĩ / lễ tân  
-- Gán tài khoản  
-- Cập nhật thông tin  
+### **Web Server & Database**
+| Apache | MySQL | XAMPP |
+|--------|--------|---------|
 
-## 4. Báo cáo – Thống kê
-- Doanh thu theo ngày / tháng / tùy chọn  
-- Doanh thu theo bác sĩ  
-- Top dịch vụ  
-- Thống kê trạng thái lịch hẹn  
-
-## 5. Backup dữ liệu
-- Xuất file SQL  
-- Xuất danh sách người dùng / dịch vụ  
+### **Database Management Tools**
+| MySQL Workbench |
+|------------------|
 
 ---
 
-# 🛎 II. LỄ TÂN
-## 1. Tạo lịch hẹn
-- Tạo cho bệnh nhân có tài khoản  
-- Tạo nhanh bệnh nhân mới  
-- Tự sinh số thứ tự  
+# 3. 🚀 Hình ảnh các chức năng
 
-## 2. Quản lý lịch hẹn
-- Lọc theo ngày / buổi / trạng thái  
-- Tìm kiếm bệnh nhân  
+## **Trang đăng nhập**
+<p align="center">
+  <img src="public\images\login.png" width="700">
+</p>
 
-## 3. Gán bác sĩ
-- Hiển thị bác sĩ đang rảnh  
-- Không có lịch IN_PROGRESS  
-- Hoặc bác sĩ đang phụ trách lịch  
+## **Trang dashboard admin**
+<p align="center">
+  <img src="public\images\admin_dashboard.png" width="700">
+</p>
 
-## 4. Cập nhật trạng thái
-- WAITING → IN_PROGRESS → COMPLETED  
-- Hủy (ghi lý do)  
-- Đánh dấu NO_SHOW  
+## **Trang dashboard lễ tân**
+<p align="center">
+  <img src="public\images\reception.png" width="700">
+</p>
 
-## 5. Gọi số thứ tự
-- Danh sách queue theo ngày  
+## **Trang dashboard nha sĩ**
+<p align="center">
+  <img src="public\images\dentist.png" width="700">
+</p>
 
----
-
-# 🩺 III. BÁC SĨ
-## 1. Xem lịch
-- Xem danh sách lịch được gán  
-
-## 2. Khám bệnh
-- Chief complaint  
-- Clinical note  
-- Diagnosis  
-- Treatment plan  
-- Next visit  
-- Extra note  
-
-## 3. Dịch vụ & hóa đơn
-- Chọn dịch vụ  
-- Nhập số lượng  
-- Tính tổng tiền  
-- Áp dụng giảm giá  
-- Lưu invoice + invoice_items  
-
-## 4. Lịch sử khám
-- Xem toàn bộ lần khám trước  
+## **Trang dashboard bệnh nhân**
+<p align="center">
+  <img src="public\images\user.png" width="700">
+</p>
 
 ---
 
-# 👤 IV. BỆNH NHÂN
-- Đăng ký / đăng nhập  
-- Đặt lịch  
-- Xem lịch hẹn  
-- Hủy lịch (khi WAITING)  
-- Xem hồ sơ khám & hóa đơn  
+# 4. ⚙ Cài đặt
 
+## **4.1 Cài đặt công cụ, môi trường cần thiết**
+
+### ✔ Cài XAMPP
+https://www.apachefriends.org/download.html
+
+### ✔ Cài VS Code + Extensions
+- PHP Intellisense
+- MySQL
+- Prettier
+- PHP Debug
 ---
 
-# 🔄 2. Flow tổng thể
+## **4.2 Tải project**
 
-## ⭐ Flow 1: Bệnh nhân đặt lịch
-1. Đăng nhập  
-2. Chọn ngày – buổi  
-3. Tạo appointment + queue number  
-4. Lễ tân xử lý  
-
-## ⭐ Flow 2: Lễ tân xử lý
-1. Kiểm tra lịch  
-2. Gán bác sĩ  
-3. Đưa sang IN_PROGRESS  
-
-## ⭐ Flow 3: Bác sĩ khám bệnh
-1. Ghi hồ sơ  
-2. Chọn dịch vụ  
-3. Tạo hóa đơn  
-
-## ⭐ Flow 4: Hoàn tất
-- Lễ tân thu tiền  
-- Cập nhật hóa đơn  
-- Ghi log báo cáo  
-
----
-
-# 👨‍💻 Công nghệ sử dụng
-- PHP (MVC)  
-- MySQL  
-- HTML / CSS / JS  
-- XAMPP / Apache  
-
----
-## 🔧 Cài đặt Database
-
-### 1 Tạo database
-
-``` sql
-CREATE DATABASE dental_clinic CHARACTER SET utf8mb4;
+```bash
+cd C:\xampp\htdocs
+git clone https://github.com/duytienkaka/Quan-Ly-Phong-Kham-Nha-Khoa.git
 ```
 
-### 2 Import file SQL
-
-Vào phpMyAdmin → chọn database **dental_clinic** → Import → chọn
-file:
-
-    database/dental_clinic.sql
-
-### 3 Cập nhật cấu hình kết nối
-
-Mở:
-
-    config/db.php
-
-Sửa thông tin:
-
-``` php
-$host = 'localhost';
-$db   = 'dental_clinic';
-$user = 'root';
-$pass = '';
+Truy cập:
+```
+http://localhost/dental_clinic
 ```
 
-------------------------------------------------------------------------
+---
 
-# 🧪 Hướng dẫn chạy
-1. Copy source vào `htdocs/`  
-2. Import database  
-3. Sửa thông tin kết nối trong `config/db.php`  
-4. Truy cập:
+## **4.3 Setup database**
+
+```sql
+CREATE DATABASE IF NOT EXISTS dental_clinic
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
+
+---
+
+## **4.4 Setup tham số kết nối**
+
+```php
+<?php
+function getPDO() {
+    static $pdo = null;
+    if ($pdo !== null) {
+        return $pdo;
+    }
+
+    $host = 'localhost';
+    $db   = 'dental_clinic';
+    $user = 'root';
+    $pass = '';           
+    $charset = 'utf8mb4';
+
+    $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+
+    try {
+        $pdo = new PDO($dsn, $user, $pass, $options);
+        return $pdo;
+    } catch (PDOException $e) {
+        die('Lỗi kết nối database: ' . $e->getMessage());
+    }
+}
+```
+
+---
+
+## **4.5 Chạy hệ thống**
+Mở XAMPP Control Panel -> Start Apache và MySQL
+
+Truy cập:
 ```
 http://localhost/dental_clinic/
 ```
 
 ---
 
+## **4.6 Đăng nhập lần đầu**
+Các tài khoản mẫu để đăng nhập lần đầu (bạn có thể đổi mật khẩu sau khi đăng nhập):
+
+- **Admin**
+  - Username: `admin`  
+  - Password: `123456`
+
+- **Receptionist (Lễ tân)**
+  - Username: `reception`  
+  - Password: 123456`
+
+- **Doctor (Bác sĩ)**
+  - Username: `bs1`  
+  - Password: `123456`
+
+- **Patient (Bệnh nhân mẫu)**
+  - Username: `patient1`  
+  - Password: `123456`
+
+Lưu ý: nếu project của bạn không có dữ liệu mẫu trong database, hãy tạo tài khoản trong giao diện Admin (`Quản lý người dùng`) hoặc import dữ liệu mẫu vào bảng `users`.
+
+Chức năng chính theo vai trò:
+
+- **Admin**
+  - Quản lý người dùng: tạo/sửa/xóa tài khoản, phân quyền (Admin / Receptionist / Doctor / Patient).
+  - Quản lý dịch vụ: thêm/sửa/xóa danh sách dịch vụ và giá.
+  - Quản lý bác sĩ và lịch làm việc: thêm bác sĩ, điều chỉnh lịch khám.
+  - Quản lý bệnh nhân: xem/sửa thông tin bệnh nhân, xuất dữ liệu.
+  - Quản lý hóa đơn và báo cáo: xem hóa đơn, báo cáo doanh thu, xuất/import dữ liệu (backup / export).
+  - Cấu hình hệ thống và sao lưu dữ liệu.
+
+- **Receptionist (Lễ tân)**
+  - Tạo, sửa, huỷ lịch hẹn cho bệnh nhân; check-in khi bệnh nhân tới.
+  - Tạo và in hóa đơn, xử lý thanh toán (mark as paid) và quản lý trạng thái thanh toán.
+  - Tạo bệnh nhân mới (khi là bệnh nhân lần đầu) hoặc tìm kiếm bệnh nhân cũ.
+  - Quản lý danh sách lịch hẹn, phân công bác sĩ và cập nhật trạng thái lịch.
+
+- **Doctor (Bác sĩ)**
+  - Xem lịch khám theo ngày/tuần, nhận thông tin bệnh nhân đã được phân công.
+  - Truy cập và ghi chép hồ sơ bệnh án (Medical Record): triệu chứng, chẩn đoán, chỉ định dịch vụ, ghi chú khám.
+  - Cập nhật trạng thái khám (đã khám / đang khám / hoàn thành) và tham khảo lịch sử bệnh nhân.
+  - Xem chi tiết hóa đơn liên quan đến bệnh nhân (nếu cần để tham khảo).
+
+- **Patient (Bệnh nhân)**
+  - Xem trang cá nhân, lịch sử khám, hoá đơn và lịch hẹn của chính mình.
+  - Đặt lịch khám mới (booking) và hủy lịch đã đặt (theo quy định).
+  - Xem chi tiết hóa đơn, lịch sử khám và hồ sơ y tế (nếu hệ thống cho phép hiển thị).
+
+Hướng dẫn nhanh sau lần đăng nhập đầu tiên:
+
+1. Đăng nhập bằng tài khoản `admin` → vào `Người dùng / Tài khoản` để kiểm tra hoặc tạo các tài khoản Receptionist/Doctor/Patient nếu cần.
+2. Kiểm tra `Dịch vụ / Giá` và nhập hoặc điều chỉnh danh sách dịch vụ trước khi nhận lịch hẹn.
+3. Receptionist sử dụng `Lễ tân` để tạo lịch hẹn và xuất hoá đơn.
+4. Bác sĩ đăng nhập, mở `Bác sĩ` → xem lịch và cập nhật hồ sơ khám.
+
+An toàn & bảo mật:
+
+- Thay mật khẩu mặc định ngay sau lần đăng nhập đầu tiên.
+- Hạn chế quyền Admin chỉ cho người quản trị thực sự.
+- Sao lưu database định kỳ trước khi chạy các thao tác thay đổi lớn.
+
+---
+
 # 🗂 Cấu trúc thư mục
+
 ```
-/dental_clinic
+/project
 │── /config
 │── /controllers
 │── /models
@@ -218,11 +230,11 @@ http://localhost/dental_clinic/
 │── /database
 └── README.md
 ```
+
 ---
 
-# 📋 Thành viên dự án
-
-| Họ và Tên             | Vai trò    |
-|-----------------------|------------|
-| **Phạm Đức Duy Tiến** | Thành viên |
-| **Dương Văn Việt**    | Thành viên |
+# 👥 Thành viên dự án
+| Họ và Tên           | Vai trò   |
+|---------------------|-----------|
+| Phạm Đức Duy Tiến   | Thành viên |
+| Dương Văn Việt      | Thành viên |

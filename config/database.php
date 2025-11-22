@@ -1,6 +1,4 @@
 <?php
-// config/database.php
-
 function getPDO() {
     static $pdo = null;
     if ($pdo !== null) {
@@ -8,9 +6,9 @@ function getPDO() {
     }
 
     $host = 'localhost';
-    $db   = 'dental_clinic';   // đúng tên DB bạn đã tạo trong Workbench
-    $user = 'root';            // sửa theo XAMPP/WAMP của bạn
-    $pass = '';                // nếu có mật khẩu thì điền vào
+    $db   = 'dental_clinic';
+    $user = 'root';
+    $pass = '';           
     $charset = 'utf8mb4';
 
     $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
