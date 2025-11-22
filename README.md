@@ -246,6 +246,20 @@ An toàn & bảo mật:
 
 ---
 
+## **Báo cáo & phân tích nghiệp vụ**
+
+Chúng tôi đã thực hiện báo cáo và phân tích chi tiết nghiệp vụ của hệ thống. Bạn có thể xem tài liệu báo cáo [tại đây](Info_Detail/Báo%20cáo%20nghiệp%20vụ.docx).
+
+Còn đây là đường dẫn trực tiếp tới file báo cáo trong repo: `Info_Detail/Báo cáo nghiệp vụ.docx`.
+
+## **Giảng viên hướng dẫn**
+
+- Ths. Lê Tuấn Anh
+
+Chúng tôi cũng xin chân thành cảm ơn Ths. Lê Tuấn Anh đã đồng hành cùng chúng tôi trong quá trình thực hiện phát triển phần mềm này. Trân trọng!
+
+---
+
 # 👥 Thành viên dự án
 | Họ và Tên           | Vai trò   |
 |---------------------|-----------|
